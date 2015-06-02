@@ -29,7 +29,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@+id/mna_page_title"
+        android:layout_below="@id/mna_page_title"
         android:layout_centerHorizontal="true" />
 
     <!-- BUTTON: SCORES APP -->
@@ -42,7 +42,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@+id/mna_button_spotify"
+        android:layout_below="@id/mna_button_spotify"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -54,7 +54,7 @@
         android:width="@dimen/mna_button_width"
         android:height="50dp"
         android:background="@color/mna_buttons"
-        android:layout_below="@+id/mna_button_scores"
+        android:layout_below="@id/mna_button_scores"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -66,7 +66,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@+id/mna_button_library"
+        android:layout_below="@id/mna_button_library"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -78,7 +78,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@+id/mna_button_bigger"
+        android:layout_below="@id/mna_button_bigger"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -90,7 +90,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_capstone_button"
-        android:layout_below="@+id/mna_button_bacon"
+        android:layout_below="@id/mna_button_bacon"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
