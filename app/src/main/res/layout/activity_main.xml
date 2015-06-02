@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
+
+    <!-- TITLE -->
+    <TextView
+        android:text="@string/mna_page_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mna_page_title"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="@dimen/mna_title_font_size"
+        android:layout_marginBottom="@dimen/mna_title_margin"
+        android:textIsSelectable="false" />
+
+    <!-- BUTTON: SPOTIFY STREAMER -->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_spotify"
+        android:id="@+id/mna_button_spotify"
+        android:width="@dimen/mna_button_width"
+        android:height="@dimen/mna_button_height"
+        android:background="@color/mna_buttons"
+        android:layout_below="@+id/mna_page_title"
+        android:layout_centerHorizontal="true" />
+
+    <!-- BUTTON: SCORES APP -->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_scores"
+        android:id="@+id/mna_button_scores"
+        android:layout_marginTop="@dimen/mna_button_margin"
+        android:width="@dimen/mna_button_width"
+        android:height="@dimen/mna_button_height"
+        android:background="@color/mna_buttons"
+        android:layout_below="@+id/mna_button_spotify"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_library"
+        android:id="@+id/mna_button_library"
+        android:layout_marginTop="@dimen/mna_button_margin"
+        android:width="@dimen/mna_button_width"
+        android:height="50dp"
+        android:background="@color/mna_buttons"
+        android:layout_below="@+id/mna_button_scores"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_bigger"
+        android:id="@+id/mna_button_bigger"
+        android:layout_marginTop="@dimen/mna_button_margin"
+        android:width="@dimen/mna_button_width"
+        android:height="@dimen/mna_button_height"
+        android:background="@color/mna_buttons"
+        android:layout_below="@+id/mna_button_library"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_bacon"
+        android:id="@+id/mna_button_bacon"
+        android:layout_marginTop="@dimen/mna_button_margin"
+        android:width="@dimen/mna_button_width"
+        android:height="@dimen/mna_button_height"
+        android:background="@color/mna_buttons"
+        android:layout_below="@+id/mna_button_bigger"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mna_button_title_capstone"
+        android:id="@+id/mna_button_capstone"
+        android:layout_marginTop="@dimen/mna_button_margin"
+        android:width="@dimen/mna_button_width"
+        android:height="@dimen/mna_button_height"
+        android:background="@color/mna_capstone_button"
+        android:layout_below="@+id/mna_button_bacon"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
