@@ -18,41 +18,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /* Variables */
-        app_context = getApplicationContext();
-
-        // ----------------------------------------------------------------
-        // ----------------------------------------------------------------
-
-        /* Buttons */
-        Button mna_button_spotify = (Button) findViewById(R.id.mna_button_spotify);
-        Button mna_button_scores = (Button) findViewById(R.id.mna_button_scores);
-        Button mna_button_library = (Button) findViewById(R.id.mna_button_library);
-        Button mna_button_bigger = (Button) findViewById(R.id.mna_button_bigger);
-        Button mna_button_bacon = (Button) findViewById(R.id.mna_button_bacon);
-        Button mna_button_capstone = (Button) findViewById(R.id.mna_button_capstone);
-
-        // ----------------------------------------------------------------
-        // ----------------------------------------------------------------
-
-        /* Listeners */
-        View.OnClickListener testListener = new View.OnClickListener() {
-            public void onClick(View v) {
-                testToast();
-            }
-        };
-        mna_button_spotify.setOnClickListener(testListener); // mna_button_spotify listener
-        // ----------------------------------------------------------------
-        mna_button_scores.setOnClickListener(testListener); // mna_button_scores listener
-        // ----------------------------------------------------------------
-        mna_button_library.setOnClickListener(testListener); // mna_button_library listener
-        // ----------------------------------------------------------------
-        mna_button_bigger.setOnClickListener(testListener); // mna_button_bigger listener
-        // ----------------------------------------------------------------
-        mna_button_bacon.setOnClickListener(testListener); // mna_button_bacon listener
-        // ----------------------------------------------------------------
-        mna_button_capstone.setOnClickListener(testListener); // mna_button_capstone listener
     }
 
     @Override
@@ -77,8 +42,19 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void testToast() {
-        CharSequence text = "This button will launch my capstone project!";
-        Toast.makeText(app_context, text, Toast.LENGTH_SHORT).show();
+    // Thank you for help :)
+    public void displayToast(View view) {
+
+        Button button = (Button) view;
+
+        String buttonText = (String) button.getText();
+
+        Context context = getApplicationContext();
+        CharSequence text = getString(R.string.open_app)
+                + buttonText;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 }

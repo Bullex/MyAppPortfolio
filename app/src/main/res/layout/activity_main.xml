@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,6 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!-- TITLE -->
@@ -14,11 +15,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/mna_page_title"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:textSize="@dimen/mna_title_font_size"
         android:layout_marginBottom="@dimen/mna_title_margin"
-        android:textIsSelectable="false" />
+        android:textIsSelectable="false"
+        android:layout_gravity="center_horizontal"/>
 
     <!-- BUTTON: SPOTIFY STREAMER -->
     <Button
@@ -29,8 +29,8 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@id/mna_page_title"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
     <!-- BUTTON: SCORES APP -->
     <Button
@@ -42,9 +42,10 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@id/mna_button_spotify"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
+    <!-- BUTTON: LIBRARY APP -->
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,9 +55,10 @@
         android:width="@dimen/mna_button_width"
         android:height="50dp"
         android:background="@color/mna_buttons"
-        android:layout_below="@id/mna_button_scores"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
+    <!-- BUTTON: BUILD IT BIGGER -->
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,9 +68,10 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@id/mna_button_library"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
+    <!-- BUTTON: BACON READER -->
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -78,9 +81,10 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
-        android:layout_below="@id/mna_button_bigger"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
+    <!-- BUTTON: CAPSTONE -->
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -90,7 +94,7 @@
         android:width="@dimen/mna_button_width"
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_capstone_button"
-        android:layout_below="@id/mna_button_bacon"
-        android:layout_centerHorizontal="true" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="displayToast"/>
 
-</RelativeLayout>
+</LinearLayout>
