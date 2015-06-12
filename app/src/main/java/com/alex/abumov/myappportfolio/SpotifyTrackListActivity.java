@@ -1,30 +1,24 @@
 package com.alex.abumov.myappportfolio;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 
-public class MainActivity extends Activity {
-
-    Context app_context;
+public class SpotifyTrackListActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_spotify_track_list);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_spotify_track_list, menu);
         return true;
     }
 
@@ -41,25 +35,5 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void displayToast(View view) {
-
-        Button button = (Button) view;
-
-        String buttonText = (String) button.getText();
-
-        Context context = getApplicationContext();
-        CharSequence text = getString(R.string.open_app)
-                + buttonText;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-    }
-
-    public void openSpotifyStreamer(View view){
-        Intent spotifyIntent = new Intent(this, SpotifyMainActivity.class);
-        startActivity(spotifyIntent);
     }
 }

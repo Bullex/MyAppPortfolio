@@ -30,7 +30,7 @@
         android:height="@dimen/mna_button_height"
         android:background="@color/mna_buttons"
         android:layout_gravity="center_horizontal"
-        android:onClick="displayToast"/>
+        android:onClick="openSpotifyStreamer"/>
 
     <!-- BUTTON: SCORES APP -->
     <Button

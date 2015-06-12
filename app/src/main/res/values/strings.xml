@@ -3,13 +3,19 @@
     <string name="action_settings">Settings</string>
     <string name="open_app">Opens the app&#160;</string>
 
-    /* My Nanodegrees Apps */
+    <!-- My Nanodegrees Apps -->
     <string name="mna_page_title">My Nanodegrees Apps!</string>
-    // Buttons
+    <!-- Buttons -->
     <string name="mna_button_title_spotify">SPOTIFY STREAMER</string>
     <string name="mna_button_title_scores">SCORES APP</string>
     <string name="mna_button_title_library">LIBRARY APP</string>
     <string name="mna_button_title_bigger">BUILD IT BIGGER</string>
     <string name="mna_button_title_bacon">BACON READER</string>
     <string name="mna_button_title_capstone">CAPSTONE: MY OWN APP</string>
+    <string name="title_activity_spotify_main">Spotify Streamer</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_spotify_track_list">Top 10 Tracks</string>
+
+    <!-- SPOTIFY STREAMER -->
+    <string name="ss_search_view_hint">Search</string>
 </resources>

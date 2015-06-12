@@ -2,4 +2,11 @@
 <resources>
     <color name="mna_buttons">#F08C35</color>
     <color name="mna_capstone_button">#C62828</color>
+
+    <!-- SPOTIFY STREAMER -->
+    <color name="ss_list_view_divider">#d9d9d9</color>
+    <color name="ss_list_view_row_start_color">#ffffff</color>
+    <color name="ss_list_view_row_end_color">#ffffff</color>
+    <color name="ss_list_view_row_hover_start_color">#ebeef0</color>
+    <color name="ss_list_view_row_hover_end_color">#ebeef0</color>
 </resources>

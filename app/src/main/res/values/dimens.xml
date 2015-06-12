@@ -8,4 +8,7 @@
     <dimen name="mna_button_width">235dp</dimen>
     <dimen name="mna_button_height">50dp</dimen>
     <dimen name="mna_button_margin">10dp</dimen>
+
+    <!-- SPOTIFY STREAMER -->
+    <dimen name="ss_list_view_row_title_size">17dp</dimen>
 </resources>
