@@ -3,10 +3,14 @@ package com.alex.abumov.myappportfolio;
 public class SpotifyArtistItem {
     private String thumbnailUrl;
     private String name;
+    private Integer popularity;
+    private String id;
 
-    public SpotifyArtistItem(String thumbnailUrl, String name){
-        this.thumbnailUrl = thumbnailUrl;
+    public SpotifyArtistItem(String id, String name, String thumbnailUrl, Integer popularity){
+        this.id = id;
         this.name = name;
+        this.thumbnailUrl = thumbnailUrl;
+        this.popularity = popularity;
     }
 
     public String getThumbnailUrl(){
@@ -15,6 +19,14 @@ public class SpotifyArtistItem {
 
     public String getName(){
         return this.name;
+    }
+
+    public String getId(){
+        return this.id;
+    }
+
+    public Integer getPopularity(){
+        return this.popularity;
     }
 
 }

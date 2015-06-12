@@ -40,7 +40,10 @@ public class SpotifyArtistsAdapter extends ArrayAdapter<SpotifyArtistItem> {
             TextView titleView = (TextView) v.findViewById(R.id.ss_title);
 
             if (thumbnailView != null) {
-                Picasso.with(getContext()).load(p.getThumbnailUrl()).fit().error(R.drawable.unknown_artist).into(thumbnailView);
+                String url = p.getThumbnailUrl();
+                if (url.length() > 0) {
+                    Picasso.with(getContext()).load(url).fit().error(R.drawable.unknown_artist).into(thumbnailView);
+                }
             }
 
             if (titleView != null) {
