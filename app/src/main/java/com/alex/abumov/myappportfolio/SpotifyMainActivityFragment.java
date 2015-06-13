@@ -1,6 +1,7 @@
 package com.alex.abumov.myappportfolio;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,17 +67,16 @@ public class SpotifyMainActivityFragment extends Fragment {
             }
         });
         List<SpotifyArtistItem> items = new ArrayList<>();
-//        items.add(new SpotifyArtistItem("http://i59.fastpic.ru/big/2013/1202/be/2fcf9a5990ea9b3c80000a9076e13bbe.jpg", "Timati"));
-//        items.add(new SpotifyArtistItem("http://www.morozrec.ru/pictures/only%20best/400/leningrad_best.jpg", "Leningrad"));
         mArtistsAdapter = new SpotifyArtistsAdapter(getActivity(), R.layout.spotify_main_list_view_row, items);
         listView.setAdapter(mArtistsAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String itemValue = mForecastAdapter.getItem(position);
-//                Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
-//                detailIntent.putExtra(Intent.EXTRA_TEXT, itemValue);
-//                startActivity(detailIntent);
+                SpotifyArtistItem itemValue = mArtistsAdapter.getItem(position);
+                Intent detailIntent = new Intent(getActivity(), SpotifyTrackListActivity.class);
+                detailIntent.putExtra(Intent.EXTRA_TEXT, itemValue.getId());
+                detailIntent.putExtra(Intent.EXTRA_TITLE, itemValue.getName());
+                startActivity(detailIntent);
             }
         });
         return rootView;

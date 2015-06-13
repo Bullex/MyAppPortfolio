@@ -10,5 +10,5 @@
     <dimen name="mna_button_margin">10dp</dimen>
 
     <!-- SPOTIFY STREAMER -->
-    <dimen name="ss_list_view_row_title_size">17dp</dimen>
+    <dimen name="ss_list_view_row_title_size">17sp</dimen>
 </resources>

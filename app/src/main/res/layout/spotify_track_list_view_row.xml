@@ -14,14 +14,25 @@
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/ss_thumbnail_content_description"/>
 
-    <!-- Artist Title -->
-    <TextView
-        android:id="@+id/ss_title"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/ss_thumbnail"
-        android:textSize="@dimen/ss_list_view_row_title_size"
-        android:textStyle="bold"/>
+        android:orientation="vertical">
+        <!-- Track Title -->
+        <TextView
+            android:id="@+id/ss_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/ss_list_view_row_title_size"
+            android:layout_marginBottom="2dp"/>
 
+        <!-- Album Title -->
+        <TextView
+            android:id="@+id/ss_album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/ss_list_view_row_title_size"/>
+    </LinearLayout>
 </RelativeLayout>

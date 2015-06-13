@@ -36,4 +36,5 @@ public class SpotifyTrackListActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
