@@ -19,4 +19,5 @@
     <!-- SPOTIFY STREAMER -->
     <string name="ss_search_view_hint">Search</string>
     <string name="ss_thumbnail_content_description">Artists thumbnail</string>
+    <string name="ss_not_found_text">Nothing found! Try again</string>
 </resources>

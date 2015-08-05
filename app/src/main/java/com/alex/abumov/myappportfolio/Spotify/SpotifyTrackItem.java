@@ -1,4 +1,4 @@
-package com.alex.abumov.myappportfolio;
+package com.alex.abumov.myappportfolio.Spotify;
 
 public class SpotifyTrackItem {
 

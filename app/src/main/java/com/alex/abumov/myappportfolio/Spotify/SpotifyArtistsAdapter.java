@@ -1,4 +1,4 @@
-package com.alex.abumov.myappportfolio;
+package com.alex.abumov.myappportfolio.Spotify;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alex.abumov.myappportfolio.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

@@ -1,5 +1,8 @@
 package com.alex.abumov.myappportfolio;
 
+import com.alex.abumov.myappportfolio.Spotify.SpotifyArtistItem;
+import com.alex.abumov.myappportfolio.Spotify.SpotifyTrackItem;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

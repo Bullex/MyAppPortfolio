@@ -20,16 +20,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SpotifyMainActivity"
+            android:name=".Spotify.SpotifyMainActivity"
             android:label="@string/title_activity_spotify_main" >
         </activity>
         <activity
-            android:name=".SpotifyTrackListActivity"
+            android:name=".Spotify.SpotifyTrackListActivity"
             android:label="@string/title_activity_spotify_track_list"
-            android:parentActivityName=".SpotifyMainActivity" >
+            android:parentActivityName=".Spotify.SpotifyMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.alex.abumov.myappportfolio.SpotifyMainActivity" />
+                android:value=".Spotify.SpotifyMainActivity" />
         </activity>
     </application>
 

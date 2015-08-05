@@ -1,9 +1,11 @@
-package com.alex.abumov.myappportfolio;
+package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.alex.abumov.myappportfolio.R;
 
 
 public class SpotifyMainActivity extends Activity {

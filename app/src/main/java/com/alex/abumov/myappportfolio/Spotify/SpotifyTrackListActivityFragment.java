@@ -1,4 +1,4 @@
-package com.alex.abumov.myappportfolio;
+package com.alex.abumov.myappportfolio.Spotify;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import com.alex.abumov.myappportfolio.DataParser;
+import com.alex.abumov.myappportfolio.R;
 
 import org.json.JSONException;
 

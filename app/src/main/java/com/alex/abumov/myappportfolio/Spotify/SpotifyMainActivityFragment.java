@@ -1,4 +1,4 @@
-package com.alex.abumov.myappportfolio;
+package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -7,12 +7,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alex.abumov.myappportfolio.DataParser;
+import com.alex.abumov.myappportfolio.R;
 
 import org.json.JSONException;
 
@@ -33,6 +39,7 @@ public class SpotifyMainActivityFragment extends Fragment {
 
     private SpotifyArtistsAdapter mArtistsAdapter;
     private ListView listView;
+    private TextView textView;
     private EditText searchView;
 
     public SpotifyMainActivityFragment() {
@@ -43,6 +50,7 @@ public class SpotifyMainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_spotify_main, container, false);
         listView = (ListView) rootView.findViewById(R.id.ss_main_list_view);
+        textView = (TextView) rootView.findViewById(R.id.ss_not_found_text);
         searchView = (EditText) rootView.findViewById(R.id.ss_search_view);
 
         searchView.addTextChangedListener(new TextWatcher() {
@@ -66,6 +74,23 @@ public class SpotifyMainActivityFragment extends Fragment {
                 }
             }
         });
+
+        searchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if(v.length() > 2){
+                        SearchArtistsTask searchTask = new SearchArtistsTask();
+                        searchTask.execute(v.getText().toString());
+                    }else{
+                        mArtistsAdapter.clear();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
         List<SpotifyArtistItem> items = new ArrayList<>();
         mArtistsAdapter = new SpotifyArtistsAdapter(getActivity(), R.layout.spotify_main_list_view_row, items);
         listView.setAdapter(mArtistsAdapter);
@@ -164,6 +189,13 @@ public class SpotifyMainActivityFragment extends Fragment {
                 mArtistsAdapter.clear();
                 for (SpotifyArtistItem artistItem : result){
                     mArtistsAdapter.add(artistItem);
+                }
+                if (mArtistsAdapter.getCount() == 0) {
+                    listView.setVisibility(View.GONE);
+                    textView.setVisibility(View.VISIBLE);
+                }else{
+                    listView.setVisibility(View.VISIBLE);
+                    textView.setVisibility(View.GONE);
                 }
             }
         }
