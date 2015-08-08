@@ -12,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.alex.abumov.myappportfolio.DataParser;
+import com.alex.abumov.myappportfolio.Network;
 import com.alex.abumov.myappportfolio.R;
 
 import org.json.JSONException;
@@ -25,7 +27,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -36,6 +37,7 @@ public class SpotifyTrackListActivityFragment extends Fragment {
     private String mArtistId;
     private String mArtistName;
     private ListView listView;
+    private ArrayList<SpotifyTrackItem> items;
     private SpotifyTracksAdapter mTracksAdapter;
 
     public SpotifyTrackListActivityFragment() {
@@ -48,7 +50,11 @@ public class SpotifyTrackListActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_spotify_track_list, container, false);
         listView = (ListView) rootView.findViewById(R.id.ss_tracks_list_view);
 
-        List<SpotifyTrackItem> items = new ArrayList<>();
+        if(savedInstanceState == null || !savedInstanceState.containsKey("key")) {
+            items = new ArrayList<>();
+        } else {
+            items = savedInstanceState.getParcelableArrayList("key");
+        }
         mTracksAdapter = new SpotifyTracksAdapter(getActivity(), R.layout.spotify_main_list_view_row, items);
         listView.setAdapter(mTracksAdapter);
 
@@ -56,10 +62,21 @@ public class SpotifyTrackListActivityFragment extends Fragment {
             mArtistId = intent.getStringExtra(Intent.EXTRA_TEXT);
             mArtistName = intent.getStringExtra(Intent.EXTRA_TITLE);
             actionBarSetup(mArtistName);
-            GetTracksTask getTracksTask = new GetTracksTask();
-            getTracksTask.execute(mArtistId);
+            if (Network.isNetworkAvailable(getActivity())){
+                GetTracksTask getTracksTask = new GetTracksTask();
+                getTracksTask.execute(mArtistId);
+            }else{
+                Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
+                toast.show();
+            }
         }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("key", items);
+        super.onSaveInstanceState(outState);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

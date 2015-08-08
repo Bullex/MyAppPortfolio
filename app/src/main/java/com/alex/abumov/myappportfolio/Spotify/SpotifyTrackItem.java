@@ -1,6 +1,9 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
-public class SpotifyTrackItem {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class SpotifyTrackItem implements Parcelable {
 
     private String id;
     private String name;
@@ -16,6 +19,15 @@ public class SpotifyTrackItem {
         this.thumbnailUrl = thumbnailUrl;
         this.popularity = popularity;
         this.previewUrl = previewUrl;
+    }
+
+    private SpotifyTrackItem(Parcel in){
+        this.id = in.readString();
+        this.name = in.readString();
+        this.album = in.readString();
+        this.thumbnailUrl = in.readString();
+        this.popularity = in.readInt();
+        this.previewUrl = in.readString();
     }
 
     public String getId(){
@@ -41,4 +53,29 @@ public class SpotifyTrackItem {
     public String getPreviewUrl(){
         return this.previewUrl;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(id);
+        out.writeString(name);
+        out.writeString(album);
+        out.writeString(thumbnailUrl);
+        out.writeInt(popularity);
+        out.writeString(previewUrl);
+    }
+
+    public static final Parcelable.Creator<SpotifyTrackItem> CREATOR = new Parcelable.Creator<SpotifyTrackItem>() {
+        public SpotifyTrackItem createFromParcel(Parcel in) {
+            return new SpotifyTrackItem(in);
+        }
+
+        public SpotifyTrackItem[] newArray(int size) {
+            return new SpotifyTrackItem[size];
+        }
+    };
 }

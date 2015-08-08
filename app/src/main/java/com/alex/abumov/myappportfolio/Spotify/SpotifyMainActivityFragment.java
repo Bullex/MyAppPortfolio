@@ -16,8 +16,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alex.abumov.myappportfolio.DataParser;
+import com.alex.abumov.myappportfolio.Network;
 import com.alex.abumov.myappportfolio.R;
 
 import org.json.JSONException;
@@ -29,7 +31,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -41,6 +42,7 @@ public class SpotifyMainActivityFragment extends Fragment {
     private ListView listView;
     private TextView textView;
     private EditText searchView;
+    private ArrayList<SpotifyArtistItem> items;
 
     public SpotifyMainActivityFragment() {
     }
@@ -66,10 +68,15 @@ public class SpotifyMainActivityFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() > 2){
-                    SearchArtistsTask searchTask = new SearchArtistsTask();
-                    searchTask.execute(s.toString());
-                }else{
+                if (s.length() > 0) {
+                    if (Network.isNetworkAvailable(getActivity())){
+                        SearchArtistsTask searchTask = new SearchArtistsTask();
+                        searchTask.execute(s.toString());
+                    }else{
+                        Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                } else {
                     mArtistsAdapter.clear();
                 }
             }
@@ -79,10 +86,15 @@ public class SpotifyMainActivityFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    if(v.length() > 2){
-                        SearchArtistsTask searchTask = new SearchArtistsTask();
-                        searchTask.execute(v.getText().toString());
-                    }else{
+                    if (v.length() > 0) {
+                        if (Network.isNetworkAvailable(getActivity())){
+                            SearchArtistsTask searchTask = new SearchArtistsTask();
+                            searchTask.execute(v.getText().toString());
+                        }else{
+                            Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    } else {
                         mArtistsAdapter.clear();
                     }
                     return true;
@@ -91,7 +103,13 @@ public class SpotifyMainActivityFragment extends Fragment {
             }
         });
 
-        List<SpotifyArtistItem> items = new ArrayList<>();
+
+        if(savedInstanceState == null || !savedInstanceState.containsKey("key")) {
+            items = new ArrayList<>();
+        } else {
+            items = savedInstanceState.getParcelableArrayList("key");
+        }
+
         mArtistsAdapter = new SpotifyArtistsAdapter(getActivity(), R.layout.spotify_main_list_view_row, items);
         listView.setAdapter(mArtistsAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,6 +123,12 @@ public class SpotifyMainActivityFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("key", items);
+        super.onSaveInstanceState(outState);
     }
 
     private class SearchArtistsTask extends AsyncTask<String, Void, ArrayList<SpotifyArtistItem>> {
