@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alex.abumov.myappportfolio.DataParser;
@@ -37,6 +38,7 @@ public class SpotifyTrackListActivityFragment extends Fragment {
     private String mArtistId;
     private String mArtistName;
     private ListView listView;
+    private TextView textView;
     private ArrayList<SpotifyTrackItem> items;
     private SpotifyTracksAdapter mTracksAdapter;
 
@@ -49,6 +51,7 @@ public class SpotifyTrackListActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         View rootView = inflater.inflate(R.layout.fragment_spotify_track_list, container, false);
         listView = (ListView) rootView.findViewById(R.id.ss_tracks_list_view);
+        textView = (TextView) rootView.findViewById(R.id.ss_track_list_empty_text);
 
         if(savedInstanceState == null || !savedInstanceState.containsKey("key")) {
             items = new ArrayList<>();
@@ -169,6 +172,13 @@ public class SpotifyTrackListActivityFragment extends Fragment {
                 mTracksAdapter.clear();
                 for (SpotifyTrackItem trackItem : result){
                     mTracksAdapter.add(trackItem);
+                }
+                if (mTracksAdapter.getCount() == 0) {
+                    listView.setVisibility(View.GONE);
+                    textView.setVisibility(View.VISIBLE);
+                }else{
+                    listView.setVisibility(View.VISIBLE);
+                    textView.setVisibility(View.GONE);
                 }
             }
         }

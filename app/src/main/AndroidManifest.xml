@@ -23,7 +23,8 @@
         </activity>
         <activity
             android:name=".Spotify.SpotifyMainActivity"
-            android:label="@string/title_activity_spotify_main" >
+            android:label="@string/title_activity_spotify_main"
+            android:launchMode="singleTop">
         </activity>
         <activity
             android:name=".Spotify.SpotifyTrackListActivity"
