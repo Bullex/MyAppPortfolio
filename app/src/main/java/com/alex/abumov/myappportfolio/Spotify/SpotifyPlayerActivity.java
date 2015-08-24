@@ -1,40 +1,41 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.alex.abumov.myappportfolio.R;
 
-
-public class SpotifyTrackListActivity extends Activity {
+public class SpotifyPlayerActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_spotify_track_list);
+        setContentView(R.layout.activity_spotify_player);
 
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
-            arguments.putString(Intent.EXTRA_TEXT,
-                    getIntent().getStringExtra(Intent.EXTRA_TEXT));
-            arguments.putString(Intent.EXTRA_TITLE,
-                    getIntent().getStringExtra(Intent.EXTRA_TITLE));
-            SpotifyTrackListActivityFragment fragment = new SpotifyTrackListActivityFragment();
+            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_ID,
+                    "asdasdsdasd");
+            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_NAME,
+                    "Coldplay");
+            arguments.putString(SpotifyPlayerActivityFragment.ALBUM_NAME,
+                    "Ghost Stories");
+            arguments.putString(SpotifyPlayerActivityFragment.TRACK_NAME,
+                    "A Sky Full Of Stars");
+            SpotifyPlayerActivityFragment fragment = new SpotifyPlayerActivityFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
-                    .add(R.id.fragment_track_list, fragment)
+                    .add(R.id.fragment_player, fragment)
                     .commit();
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_spotify_track_list, menu);
+        getMenuInflater().inflate(R.menu.menu_spotify_player, menu);
         return true;
     }
 
@@ -48,14 +49,11 @@ public class SpotifyTrackListActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == android.R.id.home) {
+        }else if (id == android.R.id.home) {
             onBackPressed();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
 }

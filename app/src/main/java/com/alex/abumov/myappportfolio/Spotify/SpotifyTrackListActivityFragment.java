@@ -2,7 +2,7 @@ package com.alex.abumov.myappportfolio.Spotify;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,13 +33,25 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SpotifyTrackListActivityFragment extends Fragment {
+public class SpotifyTrackListActivityFragment extends ListFragment {
 
-    private String mArtistId;
-    private String mArtistName;
-    private ListView listView;
+    /**
+     * The serialization (saved instance state) Bundle key representing the
+     * activated item position. Only used on tablets.
+     */
+    private static final String STATE_ACTIVATED_POSITION = "activated_position";
+
+    /**
+     * The current activated item position. Only used on tablets.
+     */
+    private int mActivatedPosition = ListView.INVALID_POSITION;
+
+
+
+    private String mArtistId = "";
+    private String mArtistName = "";
     private TextView textView;
-    private ArrayList<SpotifyTrackItem> items;
+    static public ArrayList<SpotifyTrackItem> items;
     private SpotifyTracksAdapter mTracksAdapter;
 
     public SpotifyTrackListActivityFragment() {
@@ -50,7 +62,6 @@ public class SpotifyTrackListActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         Intent intent = getActivity().getIntent();
         View rootView = inflater.inflate(R.layout.fragment_spotify_track_list, container, false);
-        listView = (ListView) rootView.findViewById(R.id.ss_tracks_list_view);
         textView = (TextView) rootView.findViewById(R.id.ss_track_list_empty_text);
 
         if(savedInstanceState == null || !savedInstanceState.containsKey("key")) {
@@ -59,11 +70,19 @@ public class SpotifyTrackListActivityFragment extends Fragment {
             items = savedInstanceState.getParcelableArrayList("key");
         }
         mTracksAdapter = new SpotifyTracksAdapter(getActivity(), R.layout.spotify_main_list_view_row, items);
-        listView.setAdapter(mTracksAdapter);
+        setListAdapter(mTracksAdapter);
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             mArtistId = intent.getStringExtra(Intent.EXTRA_TEXT);
             mArtistName = intent.getStringExtra(Intent.EXTRA_TITLE);
+        }else {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                mArtistId = getArguments().getString(Intent.EXTRA_TEXT, "");
+                mArtistName = getArguments().getString(Intent.EXTRA_TITLE, "");
+            }
+        }
+        if (!mArtistId.isEmpty() && !mArtistName.isEmpty()){
             actionBarSetup(mArtistName);
             if (Network.isNetworkAvailable(getActivity())){
                 GetTracksTask getTracksTask = new GetTracksTask();
@@ -77,9 +96,84 @@ public class SpotifyTrackListActivityFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Restore the previously serialized activated item position.
+        if (savedInstanceState != null
+                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+        }
+    }
+
+    private void setActivatedPosition(int position) {
+        if (position == ListView.INVALID_POSITION) {
+            getListView().setItemChecked(mActivatedPosition, false);
+        } else {
+            getListView().setItemChecked(position, true);
+        }
+
+        mActivatedPosition = position;
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("key", items);
+        if (mActivatedPosition != ListView.INVALID_POSITION) {
+            // Serialize and persist the activated item position.
+            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+        }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        super.onListItemClick(listView, view, position, id);
+//
+//        // Notify the active callbacks interface (the activity, if the
+//        // fragment is attached to one) that an item has been selected.
+//        mCallbacks.onItemSelected(items.get(position));
+        SpotifyTrackItem trackItem = items.get(position);
+        if (SpotifyMainActivity.mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle arguments = new Bundle();
+            arguments.putInt(SpotifyPlayerActivityFragment.TRACK_INDEX,
+                    position);
+            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_ID,
+                    trackItem.getArtistId());
+            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_NAME,
+                    trackItem.getArtist());
+            arguments.putString(SpotifyPlayerActivityFragment.ALBUM_NAME,
+                    trackItem.getAlbum());
+            arguments.putString(SpotifyPlayerActivityFragment.TRACK_NAME,
+                    trackItem.getName());
+            arguments.putString(SpotifyPlayerActivityFragment.TRACK_THUMBNAIL_URL,
+                    trackItem.getAlbumImgUrl());
+            arguments.putString(SpotifyPlayerActivityFragment.TRACK_PREVIEW_URL,
+                    trackItem.getPreviewUrl());
+            SpotifyPlayerActivityFragment fragment = new SpotifyPlayerActivityFragment();
+            fragment.setArguments(arguments);
+            fragment.show(getFragmentManager(), fragment.getTag());
+        } else {
+            Intent detailIntent = new Intent(getActivity(), SpotifyPlayerActivity.class);
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_INDEX,
+                    position);
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.ARTIST_ID,
+                    trackItem.getArtistId());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.ARTIST_NAME,
+                    trackItem.getArtist());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.ALBUM_NAME,
+                    trackItem.getAlbum());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_NAME,
+                    trackItem.getName());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_THUMBNAIL_URL,
+                    trackItem.getAlbumImgUrl());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_PREVIEW_URL,
+                    trackItem.getPreviewUrl());
+            startActivity(detailIntent);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -174,10 +268,10 @@ public class SpotifyTrackListActivityFragment extends Fragment {
                     mTracksAdapter.add(trackItem);
                 }
                 if (mTracksAdapter.getCount() == 0) {
-                    listView.setVisibility(View.GONE);
+                    getListView().setVisibility(View.GONE);
                     textView.setVisibility(View.VISIBLE);
                 }else{
-                    listView.setVisibility(View.VISIBLE);
+                    getListView().setVisibility(View.VISIBLE);
                     textView.setVisibility(View.GONE);
                 }
             }

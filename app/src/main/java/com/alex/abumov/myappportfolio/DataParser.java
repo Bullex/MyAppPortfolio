@@ -67,6 +67,9 @@ public class DataParser {
         // These are the names of the JSON objects that need to be extracted.
         final String ND_TRACKS= "tracks";
         final String ND_ALBUM = "album";
+        final String ND_ARTISTS = "artists";
+        final String ND_ARTISTS_NAME = "name";
+        final String ND_ARTISTS_ID = "id";
         final String ND_ALBUM_NAME = "name";
         final String ND_IMAGES = "images";
         final String ND_IMAGES_URL = "url";
@@ -81,6 +84,9 @@ public class DataParser {
         for(int i = 0; i < tracksMainArray.length(); i++) {
 
             String imageUrl = "";
+            String bigImageUrl = "";
+            String artist = "";
+            String artist_id = "";
             String id;
             String name;
             Integer popularity;
@@ -101,7 +107,17 @@ public class DataParser {
                 if(imagesArray.length() > 0) {
                     JSONObject lastImageObj = imagesArray.getJSONObject(imagesArray.length() - 1);
                     imageUrl = lastImageObj.getString(ND_IMAGES_URL);
+                    JSONObject firstImageObj = imagesArray.getJSONObject(0);
+                    bigImageUrl = firstImageObj.getString(ND_IMAGES_URL);
                 }
+            }
+            // album
+            JSONArray artistArray = item.getJSONArray(ND_ARTISTS);
+            // last image obj and get image url
+            if(artistArray.length() > 0) {
+                JSONObject artistObject = artistArray.getJSONObject(0);
+                artist = artistObject.getString(ND_ARTISTS_NAME);
+                artist_id = artistObject.getString(ND_ARTISTS_ID);
             }
             // get track id
             id = item.getString(ND_ID);
@@ -113,7 +129,7 @@ public class DataParser {
             previewUrl = item.getString(ND_PREVIEW_URL);
 
             // create new Artist Obj andd add it to result array
-            resultArray.add(new SpotifyTrackItem(id, name, album, imageUrl, popularity, previewUrl));
+            resultArray.add(new SpotifyTrackItem(id, name, album, artist, artist_id, imageUrl, bigImageUrl, popularity, previewUrl));
         }
         return resultArray;
     }

@@ -8,15 +8,21 @@ public class SpotifyTrackItem implements Parcelable {
     private String id;
     private String name;
     private String album;
+    private String artist;
+    private String artist_id;
     private String thumbnailUrl;
+    private String albumImgUrl;
     private Integer popularity;
     private String previewUrl;
 
-    public SpotifyTrackItem(String id, String name, String album, String thumbnailUrl, Integer popularity, String previewUrl){
+    public SpotifyTrackItem(String id, String name, String album, String artist, String artist_id, String thumbnailUrl, String albumImgUrl, Integer popularity, String previewUrl){
         this.id = id;
         this.name = name;
         this.album = album;
+        this.artist = artist;
+        this.artist_id = artist_id;
         this.thumbnailUrl = thumbnailUrl;
+        this.albumImgUrl = albumImgUrl;
         this.popularity = popularity;
         this.previewUrl = previewUrl;
     }
@@ -25,7 +31,10 @@ public class SpotifyTrackItem implements Parcelable {
         this.id = in.readString();
         this.name = in.readString();
         this.album = in.readString();
+        this.artist = in.readString();
+        this.artist_id = in.readString();
         this.thumbnailUrl = in.readString();
+        this.albumImgUrl = in.readString();
         this.popularity = in.readInt();
         this.previewUrl = in.readString();
     }
@@ -42,8 +51,20 @@ public class SpotifyTrackItem implements Parcelable {
         return this.album;
     }
 
+    public String getArtist(){
+        return this.artist;
+    }
+
+    public String getArtistId(){
+        return this.artist_id;
+    }
+
     public String getThumbnailUrl(){
         return this.thumbnailUrl;
+    }
+
+    public String getAlbumImgUrl(){
+        return this.albumImgUrl;
     }
 
     public Integer getPopularity(){
@@ -64,7 +85,10 @@ public class SpotifyTrackItem implements Parcelable {
         out.writeString(id);
         out.writeString(name);
         out.writeString(album);
+        out.writeString(artist);
+        out.writeString(artist_id);
         out.writeString(thumbnailUrl);
+        out.writeString(albumImgUrl);
         out.writeInt(popularity);
         out.writeString(previewUrl);
     }

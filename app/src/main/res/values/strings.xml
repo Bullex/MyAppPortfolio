@@ -21,4 +21,5 @@
     <string name="ss_thumbnail_content_description">Artists thumbnail</string>
     <string name="ss_not_found_text">Nothing found! Try again</string>
     <string name="ss_track_list_empty_text">Tracks list is empty!</string>
+    <string name="title_activity_spotify_player">Spotify Streamer</string>
 </resources>

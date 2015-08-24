@@ -1,6 +1,7 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,12 +9,33 @@ import android.view.MenuItem;
 import com.alex.abumov.myappportfolio.R;
 
 
-public class SpotifyMainActivity extends Activity {
+public class SpotifyMainActivity extends Activity implements SpotifyMainActivityFragment.Callbacks {
+
+    static public boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spotify_main);
+
+        if (findViewById(R.id.fragment_track_list) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-large and
+            // res/values-sw600dp). If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+
+            // In two-pane mode, list items should be given the
+            // 'activated' state when touched.
+            ((SpotifyMainActivityFragment) getFragmentManager()
+                    .findFragmentById(R.id.fragment))
+                    .setActivateOnItemClick(true);
+        }else{
+            SpotifyMainActivityFragment fragment = new SpotifyMainActivityFragment();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.fragment, fragment)
+                    .commit();
+        }
     }
 
 
@@ -37,5 +59,27 @@ public class SpotifyMainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(SpotifyArtistItem artist) {
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle arguments = new Bundle();
+            arguments.putString(Intent.EXTRA_TEXT, artist.getId());
+            arguments.putString(Intent.EXTRA_TITLE, artist.getName());
+            SpotifyTrackListActivityFragment fragment = new SpotifyTrackListActivityFragment();
+            fragment.setArguments(arguments);
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_track_list, fragment)
+                    .commit();
+        } else {
+            Intent detailIntent = new Intent(getBaseContext(), SpotifyTrackListActivity.class);
+            detailIntent.putExtra(Intent.EXTRA_TEXT, artist.getId());
+            detailIntent.putExtra(Intent.EXTRA_TITLE, artist.getName());
+            startActivity(detailIntent);
+        }
     }
 }

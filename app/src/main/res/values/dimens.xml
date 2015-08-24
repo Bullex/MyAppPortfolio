@@ -11,4 +11,7 @@
 
     <!-- SPOTIFY STREAMER -->
     <dimen name="ss_list_view_row_title_size">17sp</dimen>
+
+    <dimen name="popup_width">500dp</dimen>
+    <dimen name="ss_player_elements_width">-1px</dimen>
 </resources>
