@@ -15,7 +15,7 @@ public class PlayerService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener{
 
-    private static final String ACTION_PLAY = "com.alex.abumov.action.PLAY";
+    public static final String EXTRA_MESSENGER="com.alex.abumov.player.EXTRA_MESSENGER";
     MediaPlayer mMediaPlayer = null;
     private final IBinder musicBind = new MusicBinder();
     private int mBufferPosition;
@@ -25,6 +25,7 @@ public class PlayerService extends Service implements
         Retrieving, // the MediaRetriever is retrieving music
         Stopped, // media player is stopped and not prepared to play
         Preparing, // media player is preparing...
+        Prepared, // media player is prepared
         Playing, // playback active (media player ready!). (but the media player may actually be
         // paused in this state if we don't have audio focus. But we stay in this state
         // so that we know we have to resume playback once we get focus back)
@@ -49,6 +50,8 @@ public class PlayerService extends Service implements
         initMusicPlayer();
     }
 
+
+
     public void setList(ArrayList<SpotifyTrackItem> tracks){
         mTracks = tracks;
     }
@@ -63,7 +66,7 @@ public class PlayerService extends Service implements
         }
     }
 
-    public void initMusicPlayer(){
+    public void initMusicPlayer() {
         mMediaPlayer.setWakeMode(getApplicationContext(),
                 PowerManager.PARTIAL_WAKE_LOCK);
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -92,11 +95,14 @@ public class PlayerService extends Service implements
     }
 
     /** Called when MediaPlayer is ready */
+    @Override
     public void onPrepared(MediaPlayer player) {
-        player.start();
-        mState = State.Playing;
+        mState = State.Prepared;
     }
 
+    public boolean isStatePrepared(){
+        return mState.equals(State.Prepared);
+    }
     @Override
     public IBinder onBind(Intent intent) {
         return musicBind;

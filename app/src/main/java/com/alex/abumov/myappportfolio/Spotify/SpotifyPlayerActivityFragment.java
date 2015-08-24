@@ -27,9 +27,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class SpotifyPlayerActivityFragment extends DialogFragment implements SeekBar.OnSeekBarChangeListener{
 
-    private PlayerService musicSrv;
+    static private PlayerService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
+
 
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -41,8 +42,16 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
             musicSrv = binder.getService();
             //pass list
             musicSrv.setList(SpotifyTrackListActivityFragment.items);
+
+            musicSrv.setSong(mTrackIndex);
+            musicSrv.playSong();
+
+            durationHandler.postDelayed(updateSeekBarTime, 100);
+
             musicBound = true;
         }
+
+
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -95,6 +104,13 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
         playBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                if (musicSrv != null) {
+//                    musicSrv.setSong(mTrackIndex);
+//                    musicSrv.playSong();
+//                    finalTime = musicSrv.getMusicDuration();
+//                    playerSB.setMax((int) finalTime);
+//                    durationHandler.postDelayed(updateSeekBarTime, 100);
+//                }
                 if (musicSrv.isPlaying()){
                     musicSrv.pauseMusic();
                     playBTN.setImageResource(android.R.drawable.ic_media_play);
@@ -157,16 +173,8 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
             playIntent = new Intent(getActivity(), PlayerService.class);
             getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             getActivity().startService(playIntent);
-            if (musicSrv != null) {
-                musicSrv.setSong(mTrackIndex);
-                musicSrv.playSong();
-                finalTime = musicSrv.getMusicDuration();
-                playerSB.setMax((int) finalTime);
-                durationHandler.postDelayed(updateSeekBarTime, 100);
-            }
         }
     }
-
 
     @Override
     public void onDestroy() {
@@ -178,16 +186,26 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
     //handler to change seekBarTime
     private Runnable updateSeekBarTime = new Runnable() {
         public void run() {
-            //get current position
-            timeElapsed = musicSrv.getCurrentPosition();
-            //set seekbar progress
-            seekTo((int)timeElapsed);
-            //set time remaing
-            double timeRemaining = finalTime - timeElapsed;
-            durationTV.setText(String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining), TimeUnit.MILLISECONDS.toSeconds((long) timeRemaining) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining))));
+            if (musicSrv != null){
+                if (musicSrv.isStatePrepared()) {
+                    finalTime = musicSrv.getMusicDuration();
+                    playerSB.setMax((int) finalTime);
+                    playBTN.setClickable(true);
+                    playBTN.setImageResource(android.R.drawable.ic_media_pause);
+                    musicSrv.startMusic();
+                }
+                //get current position
+                timeElapsed = musicSrv.getCurrentPosition();
+                //set seekbar progress
+                seekTo((int)timeElapsed);
+                //set time remaing
+                double timeRemaining = finalTime - timeElapsed;
 
-            //repeat yourself that again in 100 miliseconds
-            durationHandler.postDelayed(this, 100);
+                durationTV.setText(String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining), TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
+
+                //repeat yourself that again in 100 miliseconds
+                durationHandler.postDelayed(this, 100);
+            }
         }
     };
 
