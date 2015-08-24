@@ -76,7 +76,10 @@ public class PlayerService extends Service implements
     }
 
     public void playSong(){
-        mMediaPlayer.reset();
+        //if (!isStopped()) {
+//            mMediaPlayer.stop();
+            mMediaPlayer.reset();
+        //}
         //get song
         SpotifyTrackItem playSong = mTracks.get(trackPosn);
         String trackUrl = playSong.getPreviewUrl();
@@ -117,7 +120,6 @@ public class PlayerService extends Service implements
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
     }
 
     @Override
@@ -147,6 +149,17 @@ public class PlayerService extends Service implements
         }
     }
 
+    public void stopMusic() {
+        if (!mState.equals(State.Preparing) && !mState.equals(State.Retrieving)) {
+            mMediaPlayer.stop();
+            mState = State.Stopped;
+        }
+    }
+
+    public boolean isStopped() {
+        return mState.equals(State.Stopped);
+    }
+
     public boolean isPlaying() {
         if (mState.equals(State.Playing)) {
             return true;
@@ -163,7 +176,11 @@ public class PlayerService extends Service implements
     }
 
     public int getCurrentPosition() {
-        return mMediaPlayer.getCurrentPosition();
+        if (mState.equals(State.Stopped)){
+            return 0;
+        }else {
+            return mMediaPlayer.getCurrentPosition();
+        }
     }
 
     @Override

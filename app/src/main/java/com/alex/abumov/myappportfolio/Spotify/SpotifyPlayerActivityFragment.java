@@ -115,7 +115,11 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
                     musicSrv.pauseMusic();
                     playBTN.setImageResource(android.R.drawable.ic_media_play);
                 }else{
-                    musicSrv.startMusic();
+                    if (musicSrv.isStopped()){
+                        musicSrv.playSong();
+                    }else {
+                        musicSrv.startMusic();
+                    }
                     playBTN.setImageResource(android.R.drawable.ic_media_pause);
                 }
             }
@@ -197,12 +201,17 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
                 //get current position
                 timeElapsed = musicSrv.getCurrentPosition();
                 //set seekbar progress
-                seekTo((int)timeElapsed);
+                seekTo((int) timeElapsed);
                 //set time remaing
                 double timeRemaining = finalTime - timeElapsed;
 
                 durationTV.setText(String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining), TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
 
+                if (timeRemaining < 1000) {
+                    seekTo(0);
+                    musicSrv.stopMusic();
+                    playBTN.setImageResource(android.R.drawable.ic_media_play);
+                }
                 //repeat yourself that again in 100 miliseconds
                 durationHandler.postDelayed(this, 100);
             }
