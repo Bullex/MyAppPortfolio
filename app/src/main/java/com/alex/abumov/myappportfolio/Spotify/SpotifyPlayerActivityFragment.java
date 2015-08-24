@@ -76,6 +76,8 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
     private TextView durationTV;
     private ImageView thumbnailIV;
     private ImageButton playBTN;
+    private ImageButton prevBTN;
+    private ImageButton nextBTN;
     private SeekBar playerSB;
 
 
@@ -100,17 +102,19 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
         trackTV = (TextView) rootView.findViewById(R.id.ss_track_name);
         durationTV = (TextView) rootView.findViewById(R.id.ss_player_duration);
         thumbnailIV = (ImageView) rootView.findViewById(R.id.ss_thumbnail);
+        prevBTN = (ImageButton) rootView.findViewById(R.id.ss_player_prev);
+        prevBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
+        nextBTN = (ImageButton) rootView.findViewById(R.id.ss_player_next);
         playBTN = (ImageButton) rootView.findViewById(R.id.ss_player_play);
         playBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (musicSrv != null) {
-//                    musicSrv.setSong(mTrackIndex);
-//                    musicSrv.playSong();
-//                    finalTime = musicSrv.getMusicDuration();
-//                    playerSB.setMax((int) finalTime);
-//                    durationHandler.postDelayed(updateSeekBarTime, 100);
-//                }
                 if (musicSrv.isPlaying()){
                     musicSrv.pauseMusic();
                     playBTN.setImageResource(android.R.drawable.ic_media_play);
