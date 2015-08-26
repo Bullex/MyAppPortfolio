@@ -29,6 +29,7 @@ public class SpotifyContract {
         public static final String COLUMN_EXTERNAL_ID = "tr_external_id";
         public static final String COLUMN_ARTIST_ID = "artist_id";
         public static final String COLUMN_DESCRIPTION = "tr_description";
+        public static final String COLUMN_ALBUM = "tr_album";
         public static final String COLUMN_THUMBNAIL_URL = "tr_thumbnail_url";
         public static final String COLUMN_IMAGE_URL = "tr_album_image_url";
         public static final String COLUMN_POPULARITY = "tr_popularity";
@@ -76,6 +77,10 @@ public class SpotifyContract {
          */
         public static Uri buildArtistUri(String artist_external_id) {
             return CONTENT_URI.buildUpon().appendPath(artist_external_id).build();
+        }
+
+        public static Uri buildArtistUriById(long _id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(_id)).build();
         }
 
         public static Uri buildArtistTrackUri(String artist_external_id, String track_external_id) {

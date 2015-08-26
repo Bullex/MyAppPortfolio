@@ -1,13 +1,18 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
-import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.alex.abumov.myappportfolio.R;
+import com.alex.abumov.myappportfolio.Spotify.data.SpotifyContract;
 import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
@@ -25,11 +31,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SpotifyPlayerActivityFragment extends DialogFragment implements SeekBar.OnSeekBarChangeListener{
+public class SpotifyPlayerActivityFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor>, SeekBar.OnSeekBarChangeListener{
 
     static private PlayerService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
+    private SpotifyPlayerActivityFragment mPlayerFragment = this;
 
 
     //connect to the service
@@ -62,13 +69,28 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
     private double timeElapsed = 0, finalTime = 0;
     private Handler durationHandler = new Handler();
 
+    private static final int DETAIL_LOADER = 0;
+    private static final String[] PLAYER_COLUMNS = {
+            SpotifyContract.TrackEntry.TABLE_NAME + "." + SpotifyContract.TrackEntry._ID,
+            SpotifyContract.TrackEntry.COLUMN_EXTERNAL_ID,
+            SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID,
+            SpotifyContract.ArtistEntry.COLUMN_DESCRIPTION,
+            SpotifyContract.TrackEntry.COLUMN_ALBUM,
+            SpotifyContract.TrackEntry.COLUMN_DESCRIPTION,
+            SpotifyContract.TrackEntry.COLUMN_IMAGE_URL,
+            SpotifyContract.TrackEntry.COLUMN_POPULARITY,
+            SpotifyContract.TrackEntry.COLUMN_PREVIEW_URL,
+            SpotifyContract.TrackEntry.COLUMN_THUMBNAIL_URL
+    };
 
-    private int mTrackIndex;
+
+    private int mTrackIndex = 0;
     private String mArtistId = "";
     private String mArtistName = "";
     private String mAlbumName = "";
-    private String mTracktName = "";
-    private String mTracktThumbnailUrl = "";
+    private String mTrackId = "";
+    private String mTrackName = "";
+    private String mTrackImageUrl = "";
     private String mTrackPreviewUrl = "";
     private TextView artistTV;
     private TextView albumTV;
@@ -83,11 +105,23 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
 
     final public static String TRACK_INDEX = "track_index";
     final public static String ARTIST_ID = "artist_id";
-    final public static String ARTIST_NAME = "artist_name";
-    final public static String ALBUM_NAME = "album_name";
-    final public static String TRACK_NAME = "track_name";
-    final public static String TRACK_THUMBNAIL_URL = "track_thumbnail_url";
-    final public static String TRACK_PREVIEW_URL = "track_preview_url";
+    final public static String TRACK_ID = "track_id";
+//    final public static String ARTIST_NAME = "artist_name";
+//    final public static String ALBUM_NAME = "album_name";
+//    final public static String TRACK_NAME = "track_name";
+//    final public static String TRACK_THUMBNAIL_URL = "track_thumbnail_url";
+//    final public static String TRACK_PREVIEW_URL = "track_preview_url";
+
+    final private Integer DB_TRACK_INDEX = 0;
+    final private Integer DB_TRACK_ID = 1;
+    final private Integer DB_ARTIST_ID = 2;
+    final private Integer DB_ARTIST_NAME = 3;
+    final private Integer DB_ALBUM_NAME = 4;
+    final private Integer DB_TRACK_NAME = 5;
+    final private Integer DB_TRACK_IMAGE_URL = 6;
+    final private Integer DB_TRACK_POPULARITY = 7;
+    final private Integer DB_TRACK_PREVIEW_URL = 8;
+    final private Integer DB_TRACK_THUMBNAIL_URL = 9;
 
     public SpotifyPlayerActivityFragment() {
     }
@@ -106,22 +140,41 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
         prevBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex-1);
+                mTrackIndex--;
+                mArtistId = item.getArtistId();
+                mTrackId = item.getId();
+                getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
+                checkButtons();
+                stopService();
+                startService();
             }
         });
         nextBTN = (ImageButton) rootView.findViewById(R.id.ss_player_next);
+        nextBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex+1);
+                mTrackIndex++;
+                mArtistId = item.getArtistId();
+                mTrackId = item.getId();
+                getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
+                checkButtons();
+                stopService();
+                startService();
+            }
+        });
         playBTN = (ImageButton) rootView.findViewById(R.id.ss_player_play);
         playBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (musicSrv.isPlaying()){
+                if (musicSrv.isPlaying()) {
                     musicSrv.pauseMusic();
                     playBTN.setImageResource(android.R.drawable.ic_media_play);
-                }else{
-                    if (musicSrv.isStopped()){
+                } else {
+                    if (musicSrv.isStopped()) {
                         musicSrv.playSong();
-                    }else {
+                    } else {
                         musicSrv.startMusic();
                     }
                     playBTN.setImageResource(android.R.drawable.ic_media_pause);
@@ -134,33 +187,38 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
         if (intent != null && intent.hasExtra(ARTIST_ID)) {
             mTrackIndex = intent.getIntExtra(TRACK_INDEX, 0);
             mArtistId = intent.getStringExtra(ARTIST_ID);
-            mArtistName = intent.getStringExtra(ARTIST_NAME);
-            mAlbumName = intent.getStringExtra(ALBUM_NAME);
-            mTracktName = intent.getStringExtra(TRACK_NAME);
-            mTracktThumbnailUrl = intent.getStringExtra(TRACK_THUMBNAIL_URL);
-            mTrackPreviewUrl = intent.getStringExtra(TRACK_PREVIEW_URL);
+            mTrackId = intent.getStringExtra(TRACK_ID);
         } else {
             Bundle arguments = getArguments();
             if (arguments != null) {
                 mTrackIndex = getArguments().getInt(TRACK_INDEX, 0);
                 mArtistId = getArguments().getString(ARTIST_ID, "");
-                mArtistName = getArguments().getString(ARTIST_NAME, "");
-                mAlbumName = getArguments().getString(ALBUM_NAME, "");
-                mTracktName = getArguments().getString(TRACK_NAME, "");
-                mTracktThumbnailUrl = getArguments().getString(TRACK_THUMBNAIL_URL, "");
-                mTrackPreviewUrl = getArguments().getString(TRACK_PREVIEW_URL, "");
+                mTrackId = getArguments().getString(TRACK_ID, "");
             }
         }
 
-        artistTV.setText(mArtistName);
-        albumTV.setText(mAlbumName);
-        trackTV.setText(mTracktName);
-        if (thumbnailIV != null) {
-            if (mTracktThumbnailUrl.length() > 0) {
-                Picasso.with(getActivity()).load(mTracktThumbnailUrl).fit().error(R.drawable.unknown_artist).into(thumbnailIV);
+        checkButtons();
+
+        return rootView;
+    }
+
+    private void checkButtons(){
+        if (mTrackIndex == 0){
+            prevBTN.setClickable(false);
+        }else{
+            prevBTN.setClickable(true);
+            if (mTrackIndex == SpotifyTrackListActivityFragment.items.size() - 1){
+                nextBTN.setClickable(false);
+            }else{
+                nextBTN.setClickable(true);
             }
         }
-        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, mPlayerFragment);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -177,17 +235,27 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
 
             getDialog().getWindow().setLayout(dialogWidth, dialogHeight);
         }
-        if(playIntent==null){
-            playIntent = new Intent(getActivity(), PlayerService.class);
-            getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
-        }
+        startService();
     }
+
+    private void startService() {
+        if(playIntent==null) {
+            playIntent = new Intent(getActivity(), PlayerService.class);
+        }
+        getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        getActivity().startService(playIntent);
+    }
+
+    private void stopService() {
+        getActivity().stopService(playIntent);
+        getActivity().unbindService(musicConnection);
+        musicSrv = null;
+    }
+
 
     @Override
     public void onDestroy() {
-        getActivity().stopService(playIntent);
-        musicSrv = null;
+        stopService();
         super.onDestroy();
     }
 
@@ -241,5 +309,52 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements See
     public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Intent intent = getActivity().getIntent();
+        if (intent == null){
+            return null;
+        }
+        Uri trackInfoUri = SpotifyContract.TrackEntry.buildTrackUri(
+                mArtistId,
+                mTrackId
+        );
+        return new CursorLoader(
+                getActivity(),
+                trackInfoUri,
+                PLAYER_COLUMNS,
+                null,
+                null,
+                null
+        );
+    }
+
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null && data.moveToFirst()) {
+            mArtistName = data.getString(DB_ARTIST_NAME);
+            mAlbumName = data.getString(DB_ALBUM_NAME);
+            mTrackName = data.getString(DB_TRACK_NAME);
+            mTrackImageUrl = data.getString(DB_TRACK_IMAGE_URL);
+
+            artistTV.setText(mArtistName);
+            albumTV.setText(mAlbumName);
+            trackTV.setText(mTrackName);
+            if (thumbnailIV != null) {
+                if (mTrackImageUrl.length() > 0) {
+                    Picasso.with(getActivity()).load(mTrackImageUrl).fit().error(R.drawable.unknown_artist).into(thumbnailIV);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
 }
 

@@ -1,15 +1,15 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.alex.abumov.myappportfolio.R;
 
 
-public class SpotifyTrackListActivity extends Activity {
+public class SpotifyTrackListActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class SpotifyTrackListActivity extends Activity {
                     getIntent().getStringExtra(Intent.EXTRA_TITLE));
             SpotifyTrackListActivityFragment fragment = new SpotifyTrackListActivityFragment();
             fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_track_list, fragment)
                     .commit();
         }

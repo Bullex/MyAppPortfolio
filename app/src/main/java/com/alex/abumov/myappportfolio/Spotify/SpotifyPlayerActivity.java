@@ -1,13 +1,13 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.alex.abumov.myappportfolio.R;
 
-public class SpotifyPlayerActivity extends Activity {
+public class SpotifyPlayerActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,18 +15,8 @@ public class SpotifyPlayerActivity extends Activity {
         setContentView(R.layout.activity_spotify_player);
 
         if (savedInstanceState == null) {
-            Bundle arguments = new Bundle();
-            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_ID,
-                    "asdasdsdasd");
-            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_NAME,
-                    "Coldplay");
-            arguments.putString(SpotifyPlayerActivityFragment.ALBUM_NAME,
-                    "Ghost Stories");
-            arguments.putString(SpotifyPlayerActivityFragment.TRACK_NAME,
-                    "A Sky Full Of Stars");
             SpotifyPlayerActivityFragment fragment = new SpotifyPlayerActivityFragment();
-            fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_player, fragment)
                     .commit();
         }

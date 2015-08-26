@@ -5,9 +5,12 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
+
 
 /**
  * Created by Alexander on 24.08.2015.
@@ -17,45 +20,62 @@ public class SpotifyProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private SpotifyDbHelper mOpenHelper;
 
-    static final int ARTIST = 100;
-    static final int ARTISTS_TRACK = 101;
+    static final int ARTIST_TRACK_LIST = 100;
+    static final int ARTIST_TRACK_INFO = 101;
+    static final int ARTIST = 102;
+    static final int TRACK = 103;
 
+    private static final SQLiteQueryBuilder sArtistWithTracksQueryBuilder;
     private static final SQLiteQueryBuilder sArtistQueryBuilder;
 
     static{
-        sArtistQueryBuilder = new SQLiteQueryBuilder();
+        sArtistWithTracksQueryBuilder = new SQLiteQueryBuilder();
 
-        //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
-        sArtistQueryBuilder.setTables(
+        sArtistWithTracksQueryBuilder.setTables(
                 SpotifyContract.ArtistEntry.TABLE_NAME + " INNER JOIN " +
                         SpotifyContract.TrackEntry.TABLE_NAME +
                         " ON " + SpotifyContract.ArtistEntry.TABLE_NAME +
                         "." + SpotifyContract.ArtistEntry._ID +
                         " = " + SpotifyContract.TrackEntry.TABLE_NAME +
                         "." + SpotifyContract.TrackEntry.COLUMN_ARTIST_ID);
+
+        sArtistQueryBuilder = new SQLiteQueryBuilder();
+
+        sArtistQueryBuilder.setTables(
+                SpotifyContract.ArtistEntry.TABLE_NAME);
     }
 
     //artist.external_id = ?
-    private static final String sArtistSelection =
+    private static final String sArtistTrackListSelection =
             SpotifyContract.ArtistEntry.TABLE_NAME+
                     "." + SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID + " = ? ";
 
     //artist.external_id = ? AND track.external_id = ?
-    private static final String sArtistTrackSelection =
+    private static final String sArtistTrackInfoSelection =
             SpotifyContract.ArtistEntry.TABLE_NAME+
                     "." + SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID + " = ? AND " +
                     SpotifyContract.TrackEntry.COLUMN_EXTERNAL_ID + " = ? ";
 
-    private Cursor getArtistByExternalId(Uri uri, String[] projection, String sortOrder) {
+    private Cursor getArtistTrackListByExternalId(Uri uri, String[] projection, String sortOrder) {
         String art_external_id = SpotifyContract.ArtistEntry.getArtistExternalIdFromUri(uri);
 
         String[] selectionArgs;
         String selection;
 
-        selection = sArtistSelection;
+        selection = sArtistTrackListSelection;
         selectionArgs = new String[]{art_external_id};
 
+        return sArtistWithTracksQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getArtistByExternalId(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return sArtistQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
@@ -66,17 +86,17 @@ public class SpotifyProvider extends ContentProvider {
         );
     }
 
-    private Cursor getArtistTrackByExternalId(Uri uri, String[] projection, String sortOrder) {
+    private Cursor getArtistTrackInfoByExternalId(Uri uri, String[] projection, String sortOrder) {
         String art_external_id = SpotifyContract.ArtistEntry.getArtistExternalIdFromUri(uri);
         String tr_external_id = SpotifyContract.ArtistEntry.getTrackExternalIdFromUri(uri);
 
         String[] selectionArgs;
         String selection;
 
-        selection = sArtistTrackSelection;
+        selection = sArtistTrackInfoSelection;
         selectionArgs = new String[]{art_external_id, tr_external_id};
 
-        return sArtistQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return sArtistWithTracksQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -89,7 +109,9 @@ public class SpotifyProvider extends ContentProvider {
     static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(SpotifyContract.CONTENT_AUTHORITY, SpotifyContract.PATH_ARTIST, ARTIST);
-        uriMatcher.addURI(SpotifyContract.CONTENT_AUTHORITY, SpotifyContract.PATH_ARTIST + "/*", ARTISTS_TRACK);
+        uriMatcher.addURI(SpotifyContract.CONTENT_AUTHORITY, SpotifyContract.PATH_TRACK, TRACK);
+        uriMatcher.addURI(SpotifyContract.CONTENT_AUTHORITY, SpotifyContract.PATH_ARTIST + "/*", ARTIST_TRACK_LIST);
+        uriMatcher.addURI(SpotifyContract.CONTENT_AUTHORITY, SpotifyContract.PATH_TRACK + "/*/*", ARTIST_TRACK_INFO);
         return uriMatcher;
     }
 
@@ -103,10 +125,10 @@ public class SpotifyProvider extends ContentProvider {
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
                 return SpotifyContract.TrackEntry.CONTENT_ITEM_TYPE;
-            case ARTIST:
-                return SpotifyContract.ArtistEntry.CONTENT_ITEM_TYPE;
+            case ARTIST_TRACK_LIST:
+                return SpotifyContract.ArtistEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -117,13 +139,17 @@ public class SpotifyProvider extends ContentProvider {
                         String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
             {
-                retCursor = getArtistTrackByExternalId(uri, projection, sortOrder);
+                retCursor = getArtistTrackInfoByExternalId(uri, projection, sortOrder);
+                break;
+            }
+            case ARTIST_TRACK_LIST: {
+                retCursor = getArtistTrackListByExternalId(uri, projection, sortOrder);
                 break;
             }
             case ARTIST: {
-                retCursor = getArtistByExternalId(uri, projection, sortOrder);
+                retCursor = getArtistByExternalId(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             default:
@@ -145,10 +171,9 @@ public class SpotifyProvider extends ContentProvider {
         String artist_external_id = "";
         if (values.containsKey(SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID)){
             artist_external_id = values.get(SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID).toString();
-            values.remove(SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID);
         }
         switch (match) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
             {
                 long _id = db.insert(SpotifyContract.TrackEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
@@ -157,12 +182,29 @@ public class SpotifyProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case ARTIST: {
+            case ARTIST_TRACK_LIST: {
                 long _id = db.insert(SpotifyContract.ArtistEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = SpotifyContract.ArtistEntry.buildArtistUri(artist_external_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case ARTIST: {
+                try {
+                    long _id = db.insertOrThrow(SpotifyContract.ArtistEntry.TABLE_NAME, null, values);
+                    if ( _id > 0 )
+                        returnUri = SpotifyContract.ArtistEntry.buildArtistUriById(_id);
+                    else
+                        throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                catch(SQLException e)
+                {
+                    // Sep 12, 2013 6:50:17 AM
+                    Log.e("Exception", "SQLException" + String.valueOf(e.getMessage()));
+                    e.printStackTrace();
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
                 break;
             }
             default:
@@ -182,12 +224,12 @@ public class SpotifyProvider extends ContentProvider {
         }
 
         switch (match) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
             {
                 rowsDeleted = db.delete(SpotifyContract.TrackEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case ARTIST: {
+            case ARTIST_TRACK_LIST: {
                 rowsDeleted = db.delete(SpotifyContract.ArtistEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
@@ -200,7 +242,6 @@ public class SpotifyProvider extends ContentProvider {
         return rowsDeleted;
     }
 
-
     @Override
     public int update(
             Uri uri, ContentValues values, String selection, String[] selectionArgs) {
@@ -210,12 +251,12 @@ public class SpotifyProvider extends ContentProvider {
         int rowsUpdated = 0;
 
         switch (match) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
             {
                 rowsUpdated = db.update(SpotifyContract.TrackEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
-            case ARTIST: {
+            case ARTIST_TRACK_LIST: {
                 rowsUpdated = db.update(SpotifyContract.ArtistEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
@@ -233,8 +274,25 @@ public class SpotifyProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case ARTISTS_TRACK:
+            case ARTIST_TRACK_INFO:
             {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(SpotifyContract.TrackEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
+            case ARTIST_TRACK_LIST: {
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -257,6 +315,23 @@ public class SpotifyProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(SpotifyContract.ArtistEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
+            case TRACK: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(SpotifyContract.TrackEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

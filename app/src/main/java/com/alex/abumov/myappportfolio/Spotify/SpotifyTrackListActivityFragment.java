@@ -2,12 +2,12 @@ package com.alex.abumov.myappportfolio.Spotify;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,16 +143,8 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
                     position);
             arguments.putString(SpotifyPlayerActivityFragment.ARTIST_ID,
                     trackItem.getArtistId());
-            arguments.putString(SpotifyPlayerActivityFragment.ARTIST_NAME,
-                    trackItem.getArtist());
-            arguments.putString(SpotifyPlayerActivityFragment.ALBUM_NAME,
-                    trackItem.getAlbum());
-            arguments.putString(SpotifyPlayerActivityFragment.TRACK_NAME,
-                    trackItem.getName());
-            arguments.putString(SpotifyPlayerActivityFragment.TRACK_THUMBNAIL_URL,
-                    trackItem.getAlbumImgUrl());
-            arguments.putString(SpotifyPlayerActivityFragment.TRACK_PREVIEW_URL,
-                    trackItem.getPreviewUrl());
+            arguments.putString(SpotifyPlayerActivityFragment.TRACK_ID,
+                    trackItem.getId());
             SpotifyPlayerActivityFragment fragment = new SpotifyPlayerActivityFragment();
             fragment.setArguments(arguments);
             fragment.show(getFragmentManager(), fragment.getTag());
@@ -162,16 +154,8 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
                     position);
             detailIntent.putExtra(SpotifyPlayerActivityFragment.ARTIST_ID,
                     trackItem.getArtistId());
-            detailIntent.putExtra(SpotifyPlayerActivityFragment.ARTIST_NAME,
-                    trackItem.getArtist());
-            detailIntent.putExtra(SpotifyPlayerActivityFragment.ALBUM_NAME,
-                    trackItem.getAlbum());
-            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_NAME,
-                    trackItem.getName());
-            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_THUMBNAIL_URL,
-                    trackItem.getAlbumImgUrl());
-            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_PREVIEW_URL,
-                    trackItem.getPreviewUrl());
+            detailIntent.putExtra(SpotifyPlayerActivityFragment.TRACK_ID,
+                    trackItem.getId());
             startActivity(detailIntent);
         }
     }
@@ -251,7 +235,7 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
 
             try {
                 DataParser dataParser = new DataParser();
-                return dataParser.getTracksDataFromJson(tracksJsonStr);
+                return dataParser.getTracksDataFromJson(getActivity(), tracksJsonStr);
             }catch (JSONException e){
                 e.printStackTrace();
             }

@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class SpotifyDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 4;
 
-    static final String DATABASE_NAME = "spotify.db";
+    static final String DATABASE_NAME = "spotify2.db";
 
     public SpotifyDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -25,9 +25,7 @@ public class SpotifyDbHelper extends SQLiteOpenHelper {
                 SpotifyContract.ArtistEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
                 SpotifyContract.ArtistEntry.COLUMN_EXTERNAL_ID + " TEXT UNIQUE NOT NULL, " +
-                SpotifyContract.ArtistEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
-                SpotifyContract.ArtistEntry.COLUMN_THUMBNAIL_URL + " TEXT NOT NULL, " +
-                SpotifyContract.ArtistEntry.COLUMN_POPULARITY + " TEXT NOT NULL)";
+                SpotifyContract.ArtistEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL)";
 
         sqLiteDatabase.execSQL(SQL_CREATE_ARTIST_TABLE);
 
@@ -35,13 +33,15 @@ public class SpotifyDbHelper extends SQLiteOpenHelper {
                 SpotifyContract.TrackEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 SpotifyContract.TrackEntry.COLUMN_EXTERNAL_ID + " TEXT UNIQUE NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_ARTIST_ID + " INTEGER NOT NULL, " +
+                SpotifyContract.TrackEntry.COLUMN_ALBUM + " TEXT NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_THUMBNAIL_URL + " TEXT NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_POPULARITY + " TEXT NOT NULL, " +
                 SpotifyContract.TrackEntry.COLUMN_PREVIEW_URL + " TEXT NOT NULL, " +
                 " FOREIGN KEY (" + SpotifyContract.TrackEntry.COLUMN_ARTIST_ID + ") REFERENCES " +
-                SpotifyContract.ArtistEntry.TABLE_NAME + " (" + SpotifyContract.ArtistEntry._ID + "), ";
+                SpotifyContract.ArtistEntry.TABLE_NAME + " (" + SpotifyContract.ArtistEntry._ID + ") " +
+                " UNIQUE (" + SpotifyContract.TrackEntry.COLUMN_EXTERNAL_ID + ") ON CONFLICT REPLACE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_TRACK_TABLE);
     }
