@@ -29,7 +29,12 @@
         <activity
             android:name=".Spotify.SpotifyMainActivity"
             android:label="@string/title_activity_spotify_main"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".Spotify.SpotifyTrackListActivity"
@@ -41,7 +46,12 @@
         </activity>
         <activity
             android:name=".Spotify.SpotifyPlayerActivity"
-            android:label="@string/title_activity_spotify_player" >
+            android:label="@string/title_activity_spotify_player"
+            android:parentActivityName=".Spotify.SpotifyMainActivity" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Spotify.SpotifyMainActivity" />
         </activity>
 
         <service

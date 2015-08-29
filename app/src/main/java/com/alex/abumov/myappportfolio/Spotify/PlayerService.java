@@ -38,6 +38,8 @@ public class PlayerService extends Service implements
     private ArrayList<SpotifyTrackItem> mTracks;
     private int trackPosn;
 
+    private int seekPosition;
+
     public PlayerService() {
     }
 
@@ -75,7 +77,8 @@ public class PlayerService extends Service implements
         mMediaPlayer.setOnErrorListener(this);
     }
 
-    public void playSong(){
+    public void playSong(int progress){
+        seekPosition = progress;
         //if (!isStopped()) {
 //            mMediaPlayer.stop();
             mMediaPlayer.reset();
@@ -100,6 +103,9 @@ public class PlayerService extends Service implements
     /** Called when MediaPlayer is ready */
     @Override
     public void onPrepared(MediaPlayer player) {
+        if (seekPosition > 0) {
+            player.seekTo(seekPosition);
+        }
         mState = State.Prepared;
     }
 
@@ -114,7 +120,7 @@ public class PlayerService extends Service implements
     @Override
     public boolean onUnbind(Intent intent) {
         mMediaPlayer.stop();
-        mMediaPlayer.release();
+        mState = State.Stopped;
         return false;
     }
 
@@ -142,6 +148,9 @@ public class PlayerService extends Service implements
         }
     }
 
+    public void seekTo(int progress){
+        mMediaPlayer.seekTo(progress);
+    }
     public void startMusic() {
         if (!mState.equals(State.Preparing) && !mState.equals(State.Retrieving)) {
             mMediaPlayer.start();
@@ -158,6 +167,10 @@ public class PlayerService extends Service implements
 
     public boolean isStopped() {
         return mState.equals(State.Stopped);
+    }
+
+    public boolean isPaused() {
+        return mState.equals(State.Paused);
     }
 
     public boolean isPlaying() {

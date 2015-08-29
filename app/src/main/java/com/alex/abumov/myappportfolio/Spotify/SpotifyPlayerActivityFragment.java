@@ -51,7 +51,7 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
             musicSrv.setList(SpotifyTrackListActivityFragment.items);
 
             musicSrv.setSong(mTrackIndex);
-            musicSrv.playSong();
+            musicSrv.playSong((int)timeElapsed);
 
             durationHandler.postDelayed(updateSeekBarTime, 100);
 
@@ -106,11 +106,6 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
     final public static String TRACK_INDEX = "track_index";
     final public static String ARTIST_ID = "artist_id";
     final public static String TRACK_ID = "track_id";
-//    final public static String ARTIST_NAME = "artist_name";
-//    final public static String ALBUM_NAME = "album_name";
-//    final public static String TRACK_NAME = "track_name";
-//    final public static String TRACK_THUMBNAIL_URL = "track_thumbnail_url";
-//    final public static String TRACK_PREVIEW_URL = "track_preview_url";
 
     final private Integer DB_TRACK_INDEX = 0;
     final private Integer DB_TRACK_ID = 1;
@@ -122,6 +117,8 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
     final private Integer DB_TRACK_POPULARITY = 7;
     final private Integer DB_TRACK_PREVIEW_URL = 8;
     final private Integer DB_TRACK_THUMBNAIL_URL = 9;
+
+    private boolean mOnRotate = false;
 
     public SpotifyPlayerActivityFragment() {
     }
@@ -173,7 +170,7 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
                     playBTN.setImageResource(android.R.drawable.ic_media_play);
                 } else {
                     if (musicSrv.isStopped()) {
-                        musicSrv.playSong();
+                        musicSrv.playSong(0);
                     } else {
                         musicSrv.startMusic();
                     }
@@ -184,22 +181,39 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
         playerSB = (SeekBar) rootView.findViewById(R.id.ss_seek_bar);
         playerSB.setOnSeekBarChangeListener(this);
 
-        if (intent != null && intent.hasExtra(ARTIST_ID)) {
-            mTrackIndex = intent.getIntExtra(TRACK_INDEX, 0);
-            mArtistId = intent.getStringExtra(ARTIST_ID);
-            mTrackId = intent.getStringExtra(TRACK_ID);
-        } else {
-            Bundle arguments = getArguments();
-            if (arguments != null) {
-                mTrackIndex = getArguments().getInt(TRACK_INDEX, 0);
-                mArtistId = getArguments().getString(ARTIST_ID, "");
-                mTrackId = getArguments().getString(TRACK_ID, "");
+        if (savedInstanceState != null){
+            mTrackIndex = savedInstanceState.getInt(TRACK_INDEX, 0);
+            mArtistId = savedInstanceState.getString(ARTIST_ID);
+            mTrackId = savedInstanceState.getString(TRACK_ID);
+            timeElapsed = savedInstanceState.getInt("timeElapsed");
+            mOnRotate = false;
+        }else {
+            if (intent != null && intent.hasExtra(ARTIST_ID)) {
+                mTrackIndex = intent.getIntExtra(TRACK_INDEX, 0);
+                mArtistId = intent.getStringExtra(ARTIST_ID);
+                mTrackId = intent.getStringExtra(TRACK_ID);
+            } else {
+                Bundle arguments = getArguments();
+                if (arguments != null) {
+                    mTrackIndex = getArguments().getInt(TRACK_INDEX, 0);
+                    mArtistId = getArguments().getString(ARTIST_ID);
+                    mTrackId = getArguments().getString(TRACK_ID);
+                }
             }
         }
-
+        startService();
         checkButtons();
-
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(TRACK_INDEX, mTrackIndex);
+        outState.putString(ARTIST_ID, mArtistId);
+        outState.putString(TRACK_ID, mTrackId);
+        outState.putInt("timeElapsed", (int)timeElapsed);
+        mOnRotate = true;
+        super.onSaveInstanceState(outState);
     }
 
     private void checkButtons(){
@@ -235,7 +249,6 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
 
             getDialog().getWindow().setLayout(dialogWidth, dialogHeight);
         }
-        startService();
     }
 
     private void startService() {
@@ -255,7 +268,11 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
 
     @Override
     public void onDestroy() {
-        stopService();
+//        if (!mOnRotate) {
+            stopService();
+//        }else{
+//            musicSrv.pauseMusic();
+//        }
         super.onDestroy();
     }
 
@@ -270,19 +287,21 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
                     playBTN.setImageResource(android.R.drawable.ic_media_pause);
                     musicSrv.startMusic();
                 }
-                //get current position
-                timeElapsed = musicSrv.getCurrentPosition();
-                //set seekbar progress
-                seekTo((int) timeElapsed);
-                //set time remaing
-                double timeRemaining = finalTime - timeElapsed;
+                if (musicSrv.isPlaying()) {
+                    //get current position
+                    timeElapsed = musicSrv.getCurrentPosition();
+                    //set seekbar progress
+                    seekTo((int) timeElapsed);
+                    //set time remaing
+                    double timeRemaining = finalTime - timeElapsed;
 
-                durationTV.setText(String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining), TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
+                    durationTV.setText(String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes((long) timeRemaining), TimeUnit.MILLISECONDS.toSeconds((long) timeElapsed)));
 
-                if (timeRemaining < 1000) {
-                    seekTo(0);
-                    musicSrv.stopMusic();
-                    playBTN.setImageResource(android.R.drawable.ic_media_play);
+                    if (timeRemaining < 1000) {
+                        seekTo(0);
+                        musicSrv.stopMusic();
+                        playBTN.setImageResource(android.R.drawable.ic_media_play);
+                    }
                 }
                 //repeat yourself that again in 100 miliseconds
                 durationHandler.postDelayed(this, 100);
@@ -295,8 +314,8 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
     }
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (fromUser) {
-            seekTo(progress);
+        if (musicSrv != null && fromUser) {
+            musicSrv.seekTo(progress);
         }
     }
 
