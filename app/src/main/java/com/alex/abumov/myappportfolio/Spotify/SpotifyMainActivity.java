@@ -27,13 +27,25 @@ public class SpotifyMainActivity extends ActionBarActivity implements SpotifyMai
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            ((SpotifyMainActivityFragment) getFragmentManager()
-                    .findFragmentById(R.id.fragment))
-                    .setActivateOnItemClick(true);
+//            ((SpotifyMainActivityFragment) getFragmentManager()
+//                    .findFragmentById(R.id.fragment))
+//                    .setActivateOnItemClick(true);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment, new SpotifyMainActivityFragment())
+                    .commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_track_list, new SpotifyTrackListActivityFragment())
+                    .commit();
         }else{
-            SpotifyMainActivityFragment fragment = new SpotifyMainActivityFragment();
-            getFragmentManager().beginTransaction()
-                    .add(R.id.fragment, fragment)
+//            getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.fragment, new SpotifyMainActivityFragment())
+//                    .commit();
+//            SpotifyMainActivityFragment fragment = new SpotifyMainActivityFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment, new SpotifyMainActivityFragment())
                     .commit();
         }
     }

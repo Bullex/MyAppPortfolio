@@ -51,7 +51,11 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
             musicSrv.setList(SpotifyTrackListActivityFragment.items);
 
             musicSrv.setSong(mTrackIndex);
-            musicSrv.playSong((int)timeElapsed);
+            if (mOnRotate) {
+                musicSrv.playSong((int) timeElapsed);
+            }else{
+                musicSrv.playSong(0);
+            }
 
             durationHandler.postDelayed(updateSeekBarTime, 100);
 

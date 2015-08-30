@@ -1,10 +1,10 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;

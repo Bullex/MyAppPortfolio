@@ -11,16 +11,30 @@ master/detail flow.
 
 -->
 
-<fragment android:id="@+id/fragment"
-    android:name="com.alex.abumov.myappportfolio.Spotify.SpotifyMainActivityFragment" android:layout_width="0dp"
-    android:layout_height="match_parent" android:layout_weight="1"
-    tools:layout="@layout/fragment_spotify_main" />
+    <FrameLayout
+        android:id="@+id/fragment"
+        tools:context="com.alex.abumov.myappportfolio.Spotify.SpotifyMainActivityFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-<fragment android:id="@+id/fragment_track_list"
-    android:name="com.alex.abumov.myappportfolio.Spotify.SpotifyTrackListActivityFragment"
-    tools:layout="@layout/fragment_spotify_track_list" android:layout_width="0dp"
-    android:layout_weight="2"
-    android:layout_height="match_parent" />
+    <FrameLayout
+        android:id="@+id/fragment_track_list"
+        tools:context="com.alex.abumov.myappportfolio.Spotify.SpotifyTrackListActivityFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2" />
+
+<!--<fragment android:id="@+id/fragment"-->
+    <!--android:name="com.alex.abumov.myappportfolio.Spotify.SpotifyMainActivityFragment" android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent" android:layout_weight="1"-->
+    <!--tools:layout="@layout/fragment_spotify_main" />-->
+
+<!--<fragment android:id="@+id/fragment_track_list"-->
+    <!--android:name="com.alex.abumov.myappportfolio.Spotify.SpotifyTrackListActivityFragment"-->
+    <!--tools:layout="@layout/fragment_spotify_track_list" android:layout_width="0dp"-->
+    <!--android:layout_weight="2"-->
+    <!--android:layout_height="match_parent" />-->
 
 
 </LinearLayout>
