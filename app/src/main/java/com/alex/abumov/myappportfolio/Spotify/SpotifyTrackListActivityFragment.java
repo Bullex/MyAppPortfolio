@@ -3,8 +3,6 @@ package com.alex.abumov.myappportfolio.Spotify;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -18,15 +16,11 @@ import android.widget.Toast;
 import com.alex.abumov.myappportfolio.DataParser;
 import com.alex.abumov.myappportfolio.Network;
 import com.alex.abumov.myappportfolio.R;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
-import org.json.JSONException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -53,6 +47,11 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
     private TextView textView;
     static public ArrayList<SpotifyTrackItem> items;
     private SpotifyTracksAdapter mTracksAdapter;
+
+
+    // HTTP Request
+    private String country = "US";
+    private String track_base_url;
 
     public SpotifyTrackListActivityFragment() {
     }
@@ -85,8 +84,7 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
         if (!mArtistId.isEmpty() && !mArtistName.isEmpty()){
             actionBarSetup(mArtistName);
             if (Network.isNetworkAvailable(getActivity())){
-                GetTracksTask getTracksTask = new GetTracksTask();
-                getTracksTask.execute(mArtistId);
+                getTracks();
             }else{
                 Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
                 toast.show();
@@ -132,7 +130,6 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
 //
 //        // Notify the active callbacks interface (the activity, if the
 //        // fragment is attached to one) that an item has been selected.
-//        mCallbacks.onItemSelected(items.get(position));
         SpotifyTrackItem trackItem = items.get(position);
         if (SpotifyMainActivity.mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
@@ -170,95 +167,41 @@ public class SpotifyTrackListActivityFragment extends ListFragment {
         }
     }
 
-    private class GetTracksTask extends AsyncTask<String, Void, ArrayList<SpotifyTrackItem>> {
 
-        protected ArrayList<SpotifyTrackItem> doInBackground(String... params) {
-
-            if (params.length == 0){
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String tracksJsonStr = null;
-            String country = "US";
-
-            try {
-                final String TRACKS_BASE_URL =
-                        "https://api.spotify.com/v1/artists/"+params[0]+"/top-tracks?";
-                final String COUNTRY_PARAM = "country";
-
-                Uri buildUri = Uri.parse(TRACKS_BASE_URL).buildUpon()
-                        .appendQueryParameter(COUNTRY_PARAM, country)
-                        .build();
-
-                URL url = new URL(buildUri.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                tracksJsonStr = buffer.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } finally{
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
+    private void getTracks(){
+        track_base_url = "https://api.spotify.com/v1/artists/"+mArtistId+"/top-tracks?country="+country;
+        Ion.with(getActivity())
+            .load(track_base_url)
+            .asJsonObject()
+            .setCallback(new FutureCallback<JsonObject>() {
+                @Override
+                public void onCompleted(Exception e, JsonObject result) {
+                    if (e != null) {
                         e.printStackTrace();
+                    }else{
+                        if (result != null) {
+                            DataParser dataParser = new DataParser();
+                            try {
+                                ArrayList<SpotifyTrackItem> resultArray = dataParser.getTracksDataFromJson(getActivity(), result);
+                                if (resultArray != null) {
+                                    mTracksAdapter.clear();
+                                    for (SpotifyTrackItem trackItem : resultArray) {
+                                        mTracksAdapter.add(trackItem);
+                                    }
+                                    if (mTracksAdapter.getCount() == 0) {
+                                        getListView().setVisibility(View.GONE);
+                                        textView.setVisibility(View.VISIBLE);
+                                    } else {
+                                        getListView().setVisibility(View.VISIBLE);
+                                        textView.setVisibility(View.GONE);
+                                    }
+                                }
+                            }catch (JsonParseException ex){
+                                ex.printStackTrace();
+                            }
+                        }
                     }
                 }
-            }
-
-            try {
-                DataParser dataParser = new DataParser();
-                return dataParser.getTracksDataFromJson(getActivity(), tracksJsonStr);
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-
-
-        protected void onPostExecute(ArrayList<SpotifyTrackItem> result) {
-            if (result != null){
-                mTracksAdapter.clear();
-                for (SpotifyTrackItem trackItem : result){
-                    mTracksAdapter.add(trackItem);
-                }
-                if (mTracksAdapter.getCount() == 0) {
-                    getListView().setVisibility(View.GONE);
-                    textView.setVisibility(View.VISIBLE);
-                }else{
-                    getListView().setVisibility(View.VISIBLE);
-                    textView.setVisibility(View.GONE);
-                }
-            }
-        }
+            });
     }
 }

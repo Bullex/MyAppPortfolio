@@ -159,9 +159,6 @@ public class SpotifyProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Locations to the implementation of this function.
-     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -200,7 +197,6 @@ public class SpotifyProvider extends ContentProvider {
                 }
                 catch(SQLException e)
                 {
-                    // Sep 12, 2013 6:50:17 AM
                     Log.e("Exception", "SQLException" + String.valueOf(e.getMessage()));
                     e.printStackTrace();
                     throw new android.database.SQLException("Failed to insert row into " + uri);

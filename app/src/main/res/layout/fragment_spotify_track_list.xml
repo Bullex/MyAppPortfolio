@@ -9,8 +9,8 @@
         android:id="@+id/ss_track_list_empty_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
-        android:textSize="40sp"
+        android:paddingTop="@dimen/ss_text_nothing_padding_top"
+        android:textSize="@dimen/ss_text_nothing_text_size"
         android:gravity="center"
         android:visibility="gone"
         android:text="@string/ss_track_list_empty_text"/>
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@color/ss_list_view_divider"
-        android:dividerHeight="1dp"
+        android:dividerHeight="@dimen/divider_height"
         android:listSelector="@drawable/list_view_row_selector"/>
 
 </RelativeLayout>

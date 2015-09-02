@@ -1,6 +1,7 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,17 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 
+
+
 public class SpotifyTracksAdapter extends ArrayAdapter<SpotifyTrackItem> {
+
+    ViewHolder holder;
+
+    static class ViewHolder {
+        ImageView thumbnailView;
+        TextView titleView;
+        TextView albumView;
+    }
 
     public SpotifyTracksAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -33,30 +44,33 @@ public class SpotifyTracksAdapter extends ArrayAdapter<SpotifyTrackItem> {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
             v = vi.inflate(R.layout.spotify_track_list_view_row, null);
+            holder = new ViewHolder();
+        }else{
+            holder = (ViewHolder) v.getTag();
         }
 
         SpotifyTrackItem p = getItem(position);
 
         if (p != null) {
-            ImageView thumbnailView  = (ImageView) v.findViewById(R.id.ss_thumbnail);
-            TextView titleView = (TextView) v.findViewById(R.id.ss_title);
-            TextView albumView = (TextView) v.findViewById(R.id.ss_album);
+            holder.thumbnailView  = (ImageView) v.findViewById(R.id.ss_thumbnail);
+            holder.titleView = (TextView) v.findViewById(R.id.ss_title);
+            holder.albumView = (TextView) v.findViewById(R.id.ss_album);
 
-            if (thumbnailView != null) {
+            if (holder.thumbnailView != null) {
                 String url = p.getThumbnailUrl();
-                if (url.length() > 0) {
-                    Picasso.with(getContext()).load(url).fit().error(R.drawable.unknown_artist).into(thumbnailView);
+                if (!TextUtils.isEmpty(url)) {
+                    Picasso.with(getContext()).load(url).fit().error(R.drawable.unknown_artist).into(holder.thumbnailView);
                 }
             }
 
-            if (titleView != null) {
-                titleView.setText(p.getName());
+            if (holder.titleView != null) {
+                holder.titleView.setText(p.getName());
             }
 
-            if (albumView != null) {
-                albumView.setText(p.getAlbum());
+            if (holder.albumView != null) {
+                holder.albumView.setText(p.getAlbum());
             }
-
+            v.setTag(holder);
         }
 
         return v;

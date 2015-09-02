@@ -79,10 +79,7 @@ public class PlayerService extends Service implements
 
     public void playSong(int progress){
         seekPosition = progress;
-        //if (!isStopped()) {
-//            mMediaPlayer.stop();
-            mMediaPlayer.reset();
-        //}
+        mMediaPlayer.reset();
         //get song
         SpotifyTrackItem playSong = mTracks.get(trackPosn);
         String trackUrl = playSong.getPreviewUrl();

@@ -3,15 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_view_row_selector"
-    android:padding="8dp" >
+    android:padding="@dimen/layout_padding" >
 
     <!-- Thumbnail Image -->
     <ImageView
         android:id="@+id/ss_thumbnail"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="@dimen/ss_thumbnail_width"
+        android:layout_height="@dimen/ss_thumbnail_height"
         android:layout_alignParentStart="true"
-        android:layout_marginEnd="8dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginEnd="@dimen/ss_thumbnail_margin_right"
+        android:layout_marginRight="@dimen/ss_thumbnail_margin_right"
         android:contentDescription="@string/ss_thumbnail_content_description"/>
 
     <LinearLayout
@@ -19,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/ss_thumbnail"
+        android:layout_toRightOf="@+id/ss_thumbnail"
         android:orientation="vertical">
         <!-- Track Title -->
         <TextView
@@ -26,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/ss_list_view_row_title_size"
-            android:layout_marginBottom="2dp"/>
+            android:layout_marginBottom="@dimen/ss_title_margin_bottom"/>
 
         <!-- Album Title -->
         <TextView

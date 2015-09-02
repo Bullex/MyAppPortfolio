@@ -1,8 +1,6 @@
 package com.alex.abumov.myappportfolio.Spotify;
 
 import android.app.Activity;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Editable;
@@ -20,15 +18,11 @@ import android.widget.Toast;
 import com.alex.abumov.myappportfolio.DataParser;
 import com.alex.abumov.myappportfolio.Network;
 import com.alex.abumov.myappportfolio.R;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
-import org.json.JSONException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -83,6 +77,9 @@ public class SpotifyMainActivityFragment extends ListFragment {
     private EditText searchView;
     private ArrayList<SpotifyArtistItem> items;
 
+    // HTTP Request
+    String artist_base_url;
+
     public SpotifyMainActivityFragment() {
     }
 
@@ -109,8 +106,7 @@ public class SpotifyMainActivityFragment extends ListFragment {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
                     if (Network.isNetworkAvailable(getActivity())) {
-                        SearchArtistsTask searchTask = new SearchArtistsTask();
-                        searchTask.execute(s.toString());
+                        searchArtists(s.toString());
                     } else {
                         Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
                         toast.show();
@@ -127,8 +123,7 @@ public class SpotifyMainActivityFragment extends ListFragment {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (v.length() > 0) {
                         if (Network.isNetworkAvailable(getActivity())){
-                            SearchArtistsTask searchTask = new SearchArtistsTask();
-                            searchTask.execute(v.getText().toString());
+                            searchArtists(v.getText().toString());
                         }else{
                             Toast toast = Toast.makeText(getActivity(), getString(R.string.not_network), Toast.LENGTH_SHORT);
                             toast.show();
@@ -204,10 +199,6 @@ public class SpotifyMainActivityFragment extends ListFragment {
         mCallbacks.onItemSelected(items.get(position));
     }
 
-    /**
-     * Turns on activate-on-click mode. When this mode is on, list items will be
-     * given the 'activated' state when touched.
-     */
     public void setActivateOnItemClick(boolean activateOnItemClick) {
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
@@ -226,97 +217,42 @@ public class SpotifyMainActivityFragment extends ListFragment {
         mActivatedPosition = position;
     }
 
-    private class SearchArtistsTask extends AsyncTask<String, Void, ArrayList<SpotifyArtistItem>> {
+    private void searchArtists(String srchStr){
+        artist_base_url = "https://api.spotify.com/v1/search?q="+srchStr+"&type=artist";
 
-        protected ArrayList<SpotifyArtistItem> doInBackground(String... params) {
-
-            if (params.length == 0){
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String searchJsonStr = null;
-            String type = "artist";
-
-            try {
-                final String SEARCH_BASE_URL =
-                        "https://api.spotify.com/v1/search?";
-                final String QUERY_PARAM = "q";
-                final String TYPE_PARAM = "type";
-
-                Uri buildUri = Uri.parse(SEARCH_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(TYPE_PARAM, type)
-                        .build();
-
-                URL url = new URL(buildUri.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                searchJsonStr = buffer.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } finally{
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
+        Ion.with(getActivity())
+            .load(artist_base_url)
+            .asJsonObject()
+            .setCallback(new FutureCallback<JsonObject>() {
+                @Override
+                public void onCompleted(Exception e, JsonObject result) {
+                    if (e != null) {
                         e.printStackTrace();
+                    }else{
+                        if (result != null) {
+                            DataParser dataParser = new DataParser();
+                            try {
+                                ArrayList<SpotifyArtistItem> resultArray = dataParser.getSearchDataFromJson(result);
+                                if (resultArray != null){
+                                    mArtistsAdapter.clear();
+                                    for (SpotifyArtistItem artistItem : resultArray){
+                                        mArtistsAdapter.add(artistItem);
+                                    }
+                                    if (mArtistsAdapter.getCount() == 0) {
+                                        getListView().setVisibility(View.GONE);
+                                        textView.setVisibility(View.VISIBLE);
+                                    }else{
+                                        getListView().setVisibility(View.VISIBLE);
+                                        textView.setVisibility(View.GONE);
+                                    }
+                                }
+                            }catch (JsonParseException ex){
+                                ex.printStackTrace();
+                            }
+                        }
                     }
                 }
-            }
-
-            try {
-                DataParser dataParser = new DataParser();
-                return dataParser.getSearchDataFromJson(searchJsonStr);
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-
-
-        protected void onPostExecute(ArrayList<SpotifyArtistItem> result) {
-            if (result != null){
-                mArtistsAdapter.clear();
-                for (SpotifyArtistItem artistItem : result){
-                    mArtistsAdapter.add(artistItem);
-                }
-                if (mArtistsAdapter.getCount() == 0) {
-                    getListView().setVisibility(View.GONE);
-                    textView.setVisibility(View.VISIBLE);
-                }else{
-                    getListView().setVisibility(View.VISIBLE);
-                    textView.setVisibility(View.GONE);
-                }
-            }
-        }
+            });
     }
+
 }

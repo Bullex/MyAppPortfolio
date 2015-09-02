@@ -9,10 +9,9 @@ import android.net.Uri;
 import com.alex.abumov.myappportfolio.Spotify.SpotifyArtistItem;
 import com.alex.abumov.myappportfolio.Spotify.SpotifyTrackItem;
 import com.alex.abumov.myappportfolio.Spotify.data.SpotifyContract;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -23,8 +22,8 @@ public class DataParser {
 
     }
 
-    public ArrayList<SpotifyArtistItem> getSearchDataFromJson(String jsonStr)
-            throws JSONException {
+    public ArrayList<SpotifyArtistItem> getSearchDataFromJson(JsonObject jsonObj)
+            throws JsonParseException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String ND_ARTISTS= "artists";
@@ -36,12 +35,11 @@ public class DataParser {
         final String ND_IMAGES_URL = "url";
 
 
-        JSONObject dataJson = new JSONObject(jsonStr);
-        JSONObject artistsMainArray = dataJson.getJSONObject(ND_ARTISTS);
-        JSONArray itemsArray = artistsMainArray.getJSONArray(ND_ITEMS);
+        JsonObject artistsMainArray = jsonObj.getAsJsonObject(ND_ARTISTS);
+        JsonArray itemsArray = artistsMainArray.getAsJsonArray(ND_ITEMS);
 
         ArrayList<SpotifyArtistItem> resultArray = new ArrayList<>();
-        for(int i = 0; i < itemsArray.length(); i++) {
+        for(int i = 0; i < itemsArray.size(); i++) {
 
             String imageUrl = "";
             String id;
@@ -49,20 +47,20 @@ public class DataParser {
             Integer popularity;
 
             // curr item
-            JSONObject item = itemsArray.getJSONObject(i);
+            JsonObject item = itemsArray.get(i).getAsJsonObject();
             // images
-            JSONArray imagesArray = item.getJSONArray(ND_IMAGES);
+            JsonArray imagesArray = item.getAsJsonArray(ND_IMAGES);
             // last image obj and get image url
-            if(imagesArray.length() > 0) {
-                JSONObject lastImageObj = imagesArray.getJSONObject(imagesArray.length() - 1);
-                imageUrl = lastImageObj.getString(ND_IMAGES_URL);
+            if(imagesArray.size() > 0) {
+                JsonObject lastImageObj = imagesArray.get(imagesArray.size() - 1).getAsJsonObject();
+                imageUrl = lastImageObj.get(ND_IMAGES_URL).getAsString();
             }
             // get artist id
-            id = item.getString(ND_ID);
+            id = item.get(ND_ID).getAsString();
             // get artist name
-            name = item.getString(ND_NAME);
+            name = item.get(ND_NAME).getAsString();
             // get artist popularity
-            popularity = item.getInt(ND_POPUL);
+            popularity = item.get(ND_POPUL).getAsInt();
 
             // create new Artist Obj andd add it to result array
             resultArray.add(new SpotifyArtistItem(id, name, imageUrl, popularity));
@@ -97,8 +95,8 @@ public class DataParser {
         return id;
     }
 
-    public ArrayList<SpotifyTrackItem> getTracksDataFromJson(Context context, String jsonStr)
-            throws JSONException {
+    public ArrayList<SpotifyTrackItem> getTracksDataFromJson(Context context, JsonObject jsonObj)
+            throws JsonParseException {
 
         // These are the names of the JSON objects that need to be extracted.
         final String ND_TRACKS= "tracks";
@@ -114,11 +112,10 @@ public class DataParser {
         final String ND_PREVIEW_URL = "preview_url";
         final String ND_POPUL = "popularity";
 
-        JSONObject dataJson = new JSONObject(jsonStr);
-        JSONArray tracksMainArray = dataJson.getJSONArray(ND_TRACKS);
-        Vector<ContentValues> cVVector = new Vector<ContentValues>(tracksMainArray.length());
+        JsonArray tracksMainArray = jsonObj.getAsJsonArray(ND_TRACKS);
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(tracksMainArray.size());
         ArrayList<SpotifyTrackItem> resultArray = new ArrayList<>();
-        for(int i = 0; i < tracksMainArray.length(); i++) {
+        for(int i = 0; i < tracksMainArray.size(); i++) {
 
             String imageUrl = "";
             String bigImageUrl = "";
@@ -132,40 +129,40 @@ public class DataParser {
             String previewUrl;
 
             // curr item
-            JSONObject item = tracksMainArray.getJSONObject(i);
+            JsonObject item = tracksMainArray.get(i).getAsJsonObject();
             // album
-            JSONObject albumObject = item.getJSONObject(ND_ALBUM);
+            JsonObject albumObject = item.getAsJsonObject(ND_ALBUM);
             // last image obj and get image url
             if(albumObject != null) {
-                album = albumObject.getString(ND_ALBUM_NAME);
+                album = albumObject.get(ND_ALBUM_NAME).getAsString();
 
                 // images
-                JSONArray imagesArray = albumObject.getJSONArray(ND_IMAGES);
+                JsonArray imagesArray = albumObject.get(ND_IMAGES).getAsJsonArray();
                 // last image obj and get image url
-                if(imagesArray.length() > 0) {
-                    JSONObject lastImageObj = imagesArray.getJSONObject(imagesArray.length() - 1);
-                    imageUrl = lastImageObj.getString(ND_IMAGES_URL);
-                    JSONObject firstImageObj = imagesArray.getJSONObject(0);
-                    bigImageUrl = firstImageObj.getString(ND_IMAGES_URL);
+                if(imagesArray.size() > 0) {
+                    JsonObject lastImageObj = imagesArray.get(imagesArray.size() - 1).getAsJsonObject();
+                    imageUrl = lastImageObj.get(ND_IMAGES_URL).getAsString();
+                    JsonObject firstImageObj = imagesArray.get(0).getAsJsonObject();
+                    bigImageUrl = firstImageObj.get(ND_IMAGES_URL).getAsString();
                 }
             }
             // album
-            JSONArray artistArray = item.getJSONArray(ND_ARTISTS);
+            JsonArray artistArray = item.getAsJsonArray(ND_ARTISTS);
             // last image obj and get image url
-            if(artistArray.length() > 0) {
-                JSONObject artistObject = artistArray.getJSONObject(0);
-                artist = artistObject.getString(ND_ARTISTS_NAME);
-                artist_id = artistObject.getString(ND_ARTISTS_ID);
+            if(artistArray.size() > 0) {
+                JsonObject artistObject = artistArray.get(0).getAsJsonObject();
+                artist = artistObject.get(ND_ARTISTS_NAME).getAsString();
+                artist_id = artistObject.get(ND_ARTISTS_ID).getAsString();
                 db_artist_id = addArtist(context, artist_id, artist);
             }
             // get track id
-            id = item.getString(ND_ID);
+            id = item.get(ND_ID).getAsString();
             // get track name
-            name = item.getString(ND_NAME);
+            name = item.get(ND_NAME).getAsString();
             // get track popularity
-            popularity = item.getInt(ND_POPUL);
+            popularity = item.get(ND_POPUL).getAsInt();
             // get track preview url
-            previewUrl = item.getString(ND_PREVIEW_URL);
+            previewUrl = item.get(ND_PREVIEW_URL).getAsString();
 
             // create new Artist Obj andd add it to result array
             resultArray.add(new SpotifyTrackItem(id, name, album, artist, artist_id, imageUrl, bigImageUrl, popularity, previewUrl));

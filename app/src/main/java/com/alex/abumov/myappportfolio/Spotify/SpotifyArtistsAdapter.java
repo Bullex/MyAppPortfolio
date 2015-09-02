@@ -15,6 +15,13 @@ import java.util.List;
 
 public class SpotifyArtistsAdapter extends ArrayAdapter<SpotifyArtistItem> {
 
+    ViewHolder holder;
+
+    static class ViewHolder{
+        ImageView thumbnailView;
+        TextView titleView;
+    }
+
     public SpotifyArtistsAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
     }
@@ -32,25 +39,28 @@ public class SpotifyArtistsAdapter extends ArrayAdapter<SpotifyArtistItem> {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
             v = vi.inflate(R.layout.spotify_main_list_view_row, null);
+            holder = new ViewHolder();
+        }else{
+            holder = (ViewHolder) v.getTag();
         }
 
         SpotifyArtistItem p = getItem(position);
 
         if (p != null) {
-            ImageView thumbnailView  = (ImageView) v.findViewById(R.id.ss_thumbnail);
-            TextView titleView = (TextView) v.findViewById(R.id.ss_title);
+            holder.thumbnailView  = (ImageView) v.findViewById(R.id.ss_thumbnail);
+            holder.titleView = (TextView) v.findViewById(R.id.ss_title);
 
-            if (thumbnailView != null) {
+            if (holder.thumbnailView != null) {
                 String url = p.getThumbnailUrl();
                 if (url.length() > 0) {
-                    Picasso.with(getContext()).load(url).fit().error(R.drawable.unknown_artist).into(thumbnailView);
+                    Picasso.with(getContext()).load(url).fit().error(R.drawable.unknown_artist).into(holder.thumbnailView);
                 }
             }
 
-            if (titleView != null) {
-                titleView.setText(p.getName());
+            if (holder.titleView != null) {
+                holder.titleView.setText(p.getName());
             }
-
+            v.setTag(holder);
         }
 
         return v;

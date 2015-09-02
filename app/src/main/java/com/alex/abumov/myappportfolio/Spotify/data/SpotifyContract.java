@@ -1,7 +1,6 @@
 package com.alex.abumov.myappportfolio.Spotify.data;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.format.Time;
@@ -49,7 +48,6 @@ public class SpotifyContract {
         }
     }
 
-    /* Inner class that defines the table contents of the weather table */
     public static final class ArtistEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "artist";
@@ -68,13 +66,6 @@ public class SpotifyContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ARTIST;
 
 
-        public static Uri buildWeatherUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        /*
-            Student: Fill in this buildWeatherLocation function
-         */
         public static Uri buildArtistUri(String artist_external_id) {
             return CONTENT_URI.buildUpon().appendPath(artist_external_id).build();
         }

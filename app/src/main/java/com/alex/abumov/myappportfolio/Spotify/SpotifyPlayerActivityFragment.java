@@ -141,28 +141,30 @@ public class SpotifyPlayerActivityFragment extends DialogFragment implements Loa
         prevBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex-1);
-                mTrackIndex--;
-                mArtistId = item.getArtistId();
-                mTrackId = item.getId();
-                getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
-                checkButtons();
-                stopService();
-                startService();
+                if (0 <= --mTrackIndex) {
+                    SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex);
+                    mArtistId = item.getArtistId();
+                    mTrackId = item.getId();
+                    getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
+                    checkButtons();
+                    stopService();
+                    startService();
+                }
             }
         });
         nextBTN = (ImageButton) rootView.findViewById(R.id.ss_player_next);
         nextBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex+1);
-                mTrackIndex++;
-                mArtistId = item.getArtistId();
-                mTrackId = item.getId();
-                getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
-                checkButtons();
-                stopService();
-                startService();
+                if (SpotifyTrackListActivityFragment.items.size() > ++mTrackIndex) {
+                    SpotifyTrackItem item = SpotifyTrackListActivityFragment.items.get(mTrackIndex);
+                    mArtistId = item.getArtistId();
+                    mTrackId = item.getId();
+                    getLoaderManager().restartLoader(DETAIL_LOADER, null, mPlayerFragment);
+                    checkButtons();
+                    stopService();
+                    startService();
+                }
             }
         });
         playBTN = (ImageButton) rootView.findViewById(R.id.ss_player_play);

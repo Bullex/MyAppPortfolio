@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_margin="@dimen/activity_horizontal_margin"
     android:layout_height="match_parent">
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/ss_artist_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Coldplay"/>
+            tools:text="Coldplay"/>
 
         <TextView
             android:id="@+id/ss_album_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Ghost Stories"/>
+            tools:text="Ghost Stories"/>
 
         <ImageView
             android:id="@+id/ss_thumbnail"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="@dimen/ss_player_album_image_width"
+            android:layout_height="@dimen/ss_player_album_image_height"
             android:layout_gravity="center"
             android:scaleType="centerInside"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -38,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="A Sky Full Of Stars"/>
+            tools:text="A Sky Full Of Stars"/>
 
         <SeekBar
             android:id="@+id/ss_seek_bar"
@@ -55,13 +56,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="0:00"/>
+                tools:text="0:00"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="right"
+                android:gravity="end"
                 android:layout_weight="1"
-                android:text="0:30"/>
+                tools:text="0:30"/>
         </LinearLayout>
 
         <RelativeLayout
@@ -70,27 +71,28 @@
             android:layout_gravity="center">
             <ImageButton
                 android:id="@+id/ss_player_prev"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginLeft="24dp"
-                android:layout_gravity="left"
+                android:layout_width="@dimen/ss_player_button_width"
+                android:layout_height="@dimen/ss_player_button_height"
+                android:layout_marginStart="@dimen/ss_player_button_margin"
+                android:layout_marginLeft="@dimen/ss_player_button_margin"
+                android:layout_gravity="end"
                 android:src="@android:drawable/ic_media_previous"
                 />
             <ImageButton
                 android:id="@+id/ss_player_play"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="@dimen/ss_player_button_width"
+                android:layout_height="@dimen/ss_player_button_height"
                 android:layout_centerInParent="true"
                 android:src="@android:drawable/ic_media_play"
                 android:clickable="false"
                 />
             <ImageButton
                 android:id="@+id/ss_player_next"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginRight="24dp"
+                android:layout_width="@dimen/ss_player_button_width"
+                android:layout_height="@dimen/ss_player_button_height"
+                android:layout_marginEnd="@dimen/ss_player_button_margin"
+                android:layout_marginRight="@dimen/ss_player_button_margin"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:src="@android:drawable/ic_media_next"
                 />

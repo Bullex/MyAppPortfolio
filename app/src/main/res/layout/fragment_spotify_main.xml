@@ -17,9 +17,9 @@
         android:id="@+id/ss_not_found_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
+        android:paddingTop="@dimen/ss_text_nothing_padding_top"
         android:layout_below="@id/ss_search_view"
-        android:textSize="40sp"
+        android:textSize="@dimen/ss_text_nothing_text_size"
         android:gravity="center"
         android:visibility="gone"
         android:text="@string/ss_not_found_text"/>
@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/ss_search_view"
         android:divider="@color/ss_list_view_divider"
-        android:dividerHeight="1dp"
+        android:dividerHeight="@dimen/divider_height"
         android:listSelector="@drawable/list_view_row_selector"/>
 
 </RelativeLayout>
